@@ -31,7 +31,7 @@ Rails.application.configure do
   end
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :local
+  config.active_storage.service = :amazon
 
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
@@ -53,6 +53,7 @@ Rails.application.configure do
   # Highlight code that triggered database queries in logs.
   config.active_record.verbose_query_logs = true
 
+  Rails.application.routes.default_url_options[:host] = 'localhost:3001'
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
