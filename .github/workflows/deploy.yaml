@@ -1,9 +1,6 @@
-name: test & build
+name: deploy
 
 on:
-  pull_request:
-    branches: [ "prod", "develop" ]
-
   push:
     branches: [ "prod", "develop" ]
 
@@ -21,7 +18,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v2
         with:
-          node-version: '22.x'
+          node-version: '16.x'
       
       # Step 6: Install Node dependencies
       - name: Install Node dependencies
@@ -49,33 +46,6 @@ jobs:
           cd backend
           bundle install
   
-  package-frontend:
-    if: ${{ github_event_name == 'push' }}
-    runs-on: ubuntu-latest
-    steps:
-      # Step 1: Check out code
-      - name: Check out repository
-        uses: actions/checkout@v2
-
-      # Step 5: Set up Node for the React frontend
-      - name: Set up Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: '22.x'
-
-      # Step 7: Build React app
-      - name: Build React app
-        run: |
-          cd frontend
-          npm run build
-
-      - name: Archive production artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: front_app
-          path: |
-            frontend/build/*
-
   package-backend:
     if: ${{ github_event_name == 'push' }}
     runs-on: ubuntu-latest
@@ -94,8 +64,18 @@ jobs:
       - name: Build and push Docker image
         run: |
           IMAGE_NAME=ghcr.io/${{ github.repository }}/myapp
-          docker build -t $IMAGE_NAME:latest backend
+          docker build -t $IMAGE_NAME:latest .
           docker push $IMAGE_NAME:latest
+  
+  package-frontend:
+    if: ${{ github_event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      # Step 7: Build React app
+      - name: Build React app
+        run: |
+          cd frontend
+          npm run build
 
   
   deploy-prod:
@@ -106,26 +86,11 @@ jobs:
       - package-backend
       - package-frontend
     steps:
-      - name: Download frontend files
-        uses: actions/download-artifact@v4
-        with:
-          name: front_app
-
-      - name: Deploy React via FTP
-        uses: SamKirkland/FTP-Deploy-Action@4.3.3
-        with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASS }}
-          local-dir: front_app
-          server-dir: /home/admin/public_html
-
       - name: SSH to Swarm manager and deploy
         uses: sagebind/docker-swarm-deploy-action@v1
         with:
           ssh_host: ${{ secrets.SSH_HOST }}
           ssh_user: ${{ secrets.SSH_USER }}
           ssh_key: ${{ secrets.SSH_KEY }}
-          stack_file: stack.yml
-          stack_name: podej_dalej_prod
-      
+          stack_file: docker-compose.yml
+          stack_name: my_stack
