@@ -111,8 +111,12 @@ jobs:
   package-backend:
     # Only run if this is a push OR a manual (workflow_dispatch) event
     if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-
+    
     runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      packages: write
 
     needs: 
       - verify-frontend
@@ -133,7 +137,7 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          IMAGE_NAME=ghcr.io/${{ github.repository }}/myapp
+          IMAGE_NAME=ghcr.io/${{ github.repository }}/podej-dalej
           docker build -t $IMAGE_NAME:latest ./backend
           docker push $IMAGE_NAME:latest
 
