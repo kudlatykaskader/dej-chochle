@@ -50,7 +50,7 @@ jobs:
           bundle install
   
   package-frontend:
-    if: ${{ github_event_name == 'push' }}
+    if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
       # Step 1: Check out code
