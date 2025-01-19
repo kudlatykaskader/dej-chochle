@@ -8,11 +8,7 @@ on:
     branches: [ "prod", "develop" ]
 
 jobs:
-  # ------------------
-  # 1) Build/Test Job
-  # ------------------
-  verify_frontend:
-    # Only run this job for pull requests
+  build-frontend:
     if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
 
@@ -20,7 +16,7 @@ jobs:
       # Step 1: Check out code
       - name: Check out repository
         uses: actions/checkout@v2
-      
+
       # Step 5: Set up Node for the React frontend
       - name: Set up Node
         uses: actions/setup-node@v2
@@ -38,24 +34,23 @@ jobs:
         run: |
           cd frontend
           npm run build
-  
-  verify_backend:
+
+  build-backend:
     if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       # Step 1: Check out code
       - name: Check out repository
         uses: actions/checkout@v2
-      
-        # Step 2: Set up Ruby
+
+      # Step 2: Set up Ruby
       - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.2.2'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2.2'
 
       # Step 3: Install Ruby dependencies (Rails backend)
       - name: Install Ruby dependencies
         run: |
           cd backend
           bundle install
-  
