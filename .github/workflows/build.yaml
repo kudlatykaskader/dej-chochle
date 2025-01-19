@@ -31,7 +31,7 @@ jobs:
       - name: Install Node dependencies
         run: |
           cd frontend
-          npm install
+          npm ci
 
       # (Optional) Add test steps for your frontend, e.g.:
       # - name: Run frontend tests
@@ -88,6 +88,11 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '22.x'
+
+      - name: Install Node dependencies
+        run: |
+          cd frontend
+          npm ci
 
       - name: Build React app
         run: |
