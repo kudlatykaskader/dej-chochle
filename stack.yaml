@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  backend:
+    image: postio/podej-dalej-backend:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_URL=${DB_URL}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: overlay
