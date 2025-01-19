@@ -163,13 +163,11 @@ jobs:
 
     steps:
       - name: SSH to Swarm manager (develop) and deploy
-        uses: sagebind/docker-swarm-deploy-action@v1
+        uses: sagebind/docker-swarm-deploy-action@v2
         with:
-          ssh_host: ${{ secrets.DEV_SSH_HOST }}
-          ssh_user: ${{ secrets.DEV_SSH_USER }}
-          ssh_key:  ${{ secrets.DEV_SSH_KEY }}
-          stack_file: stack-dev.yml
-          stack_name: podej_dalej_dev
+          remote_host: ssh://${{ secrets.DEV_SSH_USER }}@${{ secrets.DEV_SSH_HOST }}
+          ssh_private_key: ${{ secrets.DEV_SSH_KEY }}
+          args: stack deploy --compose-file stack-dev.yml podej_dalej_dev
 
   # -----------------------
   # 6) Deploy to PROD
