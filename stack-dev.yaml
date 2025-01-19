@@ -1,0 +1,41 @@
+services:
+  frontend:
+    image: ghcr.io/warehog/dej-chochle/pd-frontend:dev
+    ports:
+      - 3000:3000
+    networks:
+      - pd-net
+      - proxy
+
+  backend:
+    image: ghcr.io/warehog/dej-chochle/pd-backend:dev
+    ports:
+      - 3000:3000
+    environment:
+      - DB_URL=db
+      - DB_USER=db_user
+      - DB_PASS=db_pass
+      - DB_NAME=dn_name
+    networks:
+      - pd-net
+      - proxy
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: db_name
+      POSTGRES_USER: db_user
+      POSTGRES_PASSWORD: db_pass
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - pd-net
+
+networks:
+  proxy:
+    external: true
+  pd-net:
+    driver: overlay
+
+volumes:
+  db_data:

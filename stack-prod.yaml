@@ -2,9 +2,9 @@ version: '3.8'
 
 services:
   backend:
-    image: postio/podej-dalej-backend:latest
+    image: ghcr.io/warehog/dej-chochle/podej-dalej:latest
     ports:
-      - "3000:3000"
+      - 3000:3000
     environment:
       - DB_URL=${DB_URL}
       - DB_USER=${DB_USER}
