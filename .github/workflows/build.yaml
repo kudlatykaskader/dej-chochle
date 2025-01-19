@@ -124,7 +124,7 @@ jobs:
           username: ${{ github.actor }}
           # For pushing to GHCR, you need a token with write:packages permission
           # This can be your repo's GITHUB_TOKEN if you set permissions properly, or a PAT in secrets.GHCR_TOKEN
-          password: ${{ secrets.GHCR_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
         run: |
