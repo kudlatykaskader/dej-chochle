@@ -168,7 +168,7 @@ jobs:
           remote_host: ssh://${{ secrets.DEV_SSH_USER }}@${{ secrets.DEV_SSH_HOST }}
           ssh_private_key: ${{ secrets.DEV_SSH_PRIV_KEY }}
           ssh_public_key: ${{ secrets.DEV_SSH_PUB_KEY}}
-          args: stack deploy --compose-file stack-dev.yml podej_dalej_dev
+          args: stack deploy --compose-file stack-dev.yaml podej_dalej_dev
 
   # -----------------------
   # 6) Deploy to PROD
