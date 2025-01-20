@@ -162,6 +162,9 @@ jobs:
       - package-frontend
 
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      
       - name: SSH to Swarm manager (develop) and deploy
         uses: sagebind/docker-swarm-deploy-action@v2
         with:
@@ -183,6 +186,9 @@ jobs:
       - package-frontend
 
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
       - name: Download frontend files
         uses: actions/download-artifact@v4
         with:
