@@ -165,13 +165,15 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
       
-      - name: SSH to Swarm manager (develop) and deploy
-        uses: sagebind/docker-swarm-deploy-action@v2
+      - uses: serversideup/github-action-docker-swarm-deploy@v3
         with:
-          remote_host: ssh://${{ secrets.DEV_SSH_USER }}@${{ secrets.DEV_SSH_HOST }}
-          ssh_private_key: ${{ secrets.DEV_SSH_PRIV_KEY }}
-          ssh_public_key: ${{ secrets.DEV_SSH_PUB_KEY}}
-          args: stack deploy --compose-file stack-dev.yaml podej_dalej_dev
+          docker_compose_file_path: stack-dev.yaml
+          ssh_deploy_private_key: ${{ secrets.DEV_SSH_PRIV_KEY }}
+          ssh_remote_hostname: ${{ secrets.DEV_SSH_HOST }}
+          registry: "ghcr.io"
+          registry-username: ${{ secrets.DEV_SSH_USER }}
+          registry-token: ${{ secrets.GITHUB_TOKEN }}
+          stack_name: podej-dalej-dev
 
   # -----------------------
   # 6) Deploy to PROD
