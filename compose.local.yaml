@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: frontend/
+    image: ghcr.io/warehog/dej-chochle/pd-frontend:develop
+
+  backend:
+    build: backend/
+    image: ghcr.io/warehog/dej-chochle/pd-backend:develop
+    ports:
+      - 3000:3000
+    environment:
+      RAILS_ENV: production
+      DB_ADAPTER: postgresql
+      DB_HOST: db
+      DB_NAME: db_name
+      DB_USER: db_user
+      DB_PASS: db_pass
+    depends_on:
+      - migrate
+
+  migrate:
+    build: backend/
+    image: ghcr.io/warehog/dej-chochle/pd-backend:develop
+    command: ["rails", "db:migrate",]
+    environment:
+      RAILS_ENV: production
+      DB_ADAPTER: postgresql
+      DB_HOST: db
+      DB_NAME: db_name
+      DB_USER: db_user
+      DB_PASS: db_pass
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    environment:
+      DB_ADAPTER: postgresql
+      POSTGRES_DB: db_name
+      POSTGRES_USER: db_user
+      POSTGRES_PASSWORD: db_pass
+    volumes:
+      - db_data:/var/lib/postgresql/data
+  
+  proxy:
+    image: caddy
+    ports:
+      - 6776:80
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+
+volumes:
+  db_data:
