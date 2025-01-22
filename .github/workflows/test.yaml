@@ -1,0 +1,41 @@
+name: code validation
+
+on:
+  # 1) Pull requests targeting prod/develop
+  pull_request:
+    branches: [ "prod", "develop" ]
+  # 2) Pushes to prod/develop
+  workflow_dispatch:
+
+jobs:
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22.x'
+      
+      - name: Install Node dependencies
+        run: |
+          cd frontend
+          npm ci
+
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2.2'
+
+      - name: Install Ruby dependencies
+        run: |
+          cd backend
+          bundle install
