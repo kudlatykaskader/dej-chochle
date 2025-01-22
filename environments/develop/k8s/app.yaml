@@ -80,6 +80,8 @@ spec:
           command: ["/bin/sh", "-c"]
           args: ["bundle exec rails db:migrate"]
           env:
+            - name: RAILS_ENV
+              value: "production"
             - name: DB_URL
               value: "db" # or a full connection string if required
             - name: DB_USER
@@ -95,6 +97,8 @@ spec:
           imagePullPolicy: Always
           image: ghcr.io/warehog/dej-chochle/pd-backend:develop
           env:
+            - name: RAILS_ENV
+              value: "production"
             - name: DB_URL
               value: "db"
             - name: DB_USER
