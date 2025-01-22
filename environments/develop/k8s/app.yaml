@@ -82,6 +82,8 @@ spec:
           env:
             - name: RAILS_ENV
               value: "production"
+            - DB_ADAPTER:
+              value: "postgresql"
             - name: DB_URL
               value: "db" # or a full connection string if required
             - name: DB_USER
@@ -99,6 +101,8 @@ spec:
           env:
             - name: RAILS_ENV
               value: "production"
+            - name: DB_ADAPTER
+              value: "postgresql"
             - name: DB_URL
               value: "db"
             - name: DB_USER
