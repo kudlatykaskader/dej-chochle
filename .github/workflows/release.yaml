@@ -1,0 +1,101 @@
+name: release
+
+on:
+  push:
+    branches: [ "prod", "develop" ]
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      BRANCH_NAME: ${{ github.ref_name }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Get next version
+        id: get_next_version
+        uses: thenativeweb/get-next-version@main
+        with:
+          prefix: 'v' # optional, defaults to ''
+
+      - name: Show the next version
+        run: |
+          echo ${{ steps.get_next_version.outputs.version }}
+          echo ${{ steps.get_next_version.outputs.hasNextVersion }}
+
+      - name: Docker login to GHCR
+        if: ${{ env.BRANCH_NAME != 'prod' }}
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push Docker image (Frontend)
+        if: ${{ env.BRANCH_NAME != 'prod' }}
+        run: |
+          IMAGE_NAME=ghcr.io/${{ github.repository }}/pd-frontend:${{ env.BRANCH_NAME }}
+          echo "Building Frontend image => $IMAGE_NAME"
+          cd frontend
+          docker build -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
+      
+      - name: Build and push Docker image (Backend)
+        run: |
+          IMAGE_NAME=ghcr.io/${{ github.repository }}/pd-backend:${{ env.BRANCH_NAME }}
+          echo "Building Backend image => $IMAGE_NAME"
+          docker build -t $IMAGE_NAME ./backend
+          docker push $IMAGE_NAME
+
+  # -----------------------
+  # 5) Deploy to DEVELOP
+  # -----------------------
+  deploy-develop:
+    # Deploy if on the develop branch OR manually triggered
+    if: ${{ github.ref == 'refs/heads/develop' }}
+    environment: develop
+    runs-on: ubuntu-latest
+    needs:
+      - package
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      
+      - uses: actions-hub/kubectl@master
+        env:
+          KUBE_CONFIG: ${{ secrets.PL_LP_K3S_CONFIG }}
+        with:
+          args: kubectl apply -f environments/develop/k8s/app.yaml 
+
+  # -----------------------
+  # 6) Deploy to PROD
+  # -----------------------
+  deploy-prod:
+    # Deploy if on the prod branch OR manually triggered
+    if: ${{ github.ref == 'refs/heads/prod' || github.event_name == 'workflow_dispatch' }}
+    environment: prod
+    runs-on: ubuntu-latest
+    needs: 
+      - package-backend
+      - package-frontend
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - uses: actions-hub/kubectl@master
+        env:
+          KUBE_CONFIG: ${{ secrets.PL_LP_K3S_CONFIG }}
+        with:
+          args: kubectl apply -f environments/prod/k8s/app.yaml

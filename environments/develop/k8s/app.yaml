@@ -1,0 +1,164 @@
+###
+# POSTGRES DEPLOYMENT + SERVICE
+# For a real production cluster, consider using a StatefulSet and properly configured volumes.
+###
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+  namespace: pd-dev-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15
+          env:
+            - name: POSTGRES_DB
+              value: db_name
+            - name: POSTGRES_USER
+              value: db_user
+            - name: POSTGRES_PASSWORD
+              value: db_pass
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: db-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: db-data
+          emptyDir: {}
+          # For production, replace emptyDir with a PersistentVolumeClaim reference:
+          # persistentVolumeClaim:
+          #   claimName: db-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: pd-dev-ns
+spec:
+  selector:
+    app: db
+  ports:
+    - name: postgres
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+
+---
+###
+# BACKEND DEPLOYMENT + SERVICE
+###
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: pd-dev-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      # Init container to run migrations BEFORE the main backend container starts
+      initContainers:
+        - name: migrate
+          image: ghcr.io/warehog/dej-chochle/pd-backend:develop
+          command: ["/bin/sh", "-c"]
+          args: ["bundle exec rails db:migrate"]
+          env:
+            - name: DB_URL
+              value: "db" # or a full connection string if required
+            - name: DB_USER
+              value: "db_user"
+            - name: DB_PASS
+              value: "db_pass"
+            - name: DB_NAME
+              value: "db_name"
+          # If your Rails container needs RAILS_ENV or other variables, add them here as well.
+
+      containers:
+        - name: backend
+          imagePullPolicy: Always
+          image: ghcr.io/warehog/dej-chochle/pd-backend:develop
+          env:
+            - name: DB_URL
+              value: "db"
+            - name: DB_USER
+              value: "db_user"
+            - name: DB_PASS
+              value: "db_pass"
+            - name: DB_NAME
+              value: "db_name"
+            # Add any other environment variables your backend needs
+          ports:
+            - containerPort: 3000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: pd-dev-ns
+spec:
+  selector:
+    app: backend
+  ports:
+    - name: http
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+
+---
+###
+# FRONTEND DEPLOYMENT + SERVICE
+###
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: pd-dev-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: ghcr.io/warehog/dej-chochle/pd-frontend:develop
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: pd-dev-ns
+spec:
+  selector:
+    app: frontend
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
