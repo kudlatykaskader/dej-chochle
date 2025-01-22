@@ -86,9 +86,8 @@ jobs:
     if: ${{ github.ref == 'refs/heads/prod' || github.event_name == 'workflow_dispatch' }}
     environment: prod
     runs-on: ubuntu-latest
-    needs: 
-      - package-backend
-      - package-frontend
+    needs:
+      - package
 
     steps:
       - name: Check out repository
