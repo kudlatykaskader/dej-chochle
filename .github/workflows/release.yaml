@@ -76,7 +76,7 @@ jobs:
         env:
           KUBE_CONFIG: ${{ secrets.PL_LP_K3S_CONFIG }}
         with:
-          args: kubectl apply -f environments/develop/k8s/app.yaml 
+          args: apply -f environments/develop/k8s/app.yaml 
 
   # -----------------------
   # 6) Deploy to PROD
@@ -97,4 +97,4 @@ jobs:
         env:
           KUBE_CONFIG: ${{ secrets.PL_LP_K3S_CONFIG }}
         with:
-          args: kubectl apply -f environments/prod/k8s/app.yaml
+          args: apply -f environments/prod/k8s/app.yaml
