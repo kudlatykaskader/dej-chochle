@@ -30,7 +30,7 @@ spec:
           ports:
             - containerPort: 5432
           volumeMounts:
-            - name: db-data
+            - name: pd-dev-db-data
               mountPath: /var/lib/postgresql/data
       volumes:
         - name: pd-dev-db-data
@@ -210,7 +210,7 @@ spec:
             - name: MINIO_DEFAULT_BUCKETS
               value: pd
           volumeMounts:
-            - name: minio-data
+            - name: pd-dev-minio-data
               mountPath: /data
       volumes:
         - name: pd-dev-minio-data
