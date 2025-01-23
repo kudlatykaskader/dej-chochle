@@ -82,17 +82,17 @@ spec:
           args: ["env && bundle exec rails db:migrate"]
           env:
             - name: RAILS_ENV
-              value: "production"
+              value: production
             - name: DB_ADAPTER
-              value: "postgresql"
-            - name: DB_URL
-              value: "db" # or a full connection string if required
+              value: postgresql
+            - name: DB_HOST
+              value: db
             - name: DB_USER
-              value: "db_user"
+              value: db_user
             - name: DB_PASS
-              value: "db_pass"
+              value: db_pass
             - name: DB_NAME
-              value: "db_name"
+              value: db_name
           # If your Rails container needs RAILS_ENV or other variables, add them here as well.
 
       containers:
@@ -101,17 +101,17 @@ spec:
           image: ghcr.io/warehog/dej-chochle/pd-backend:develop
           env:
             - name: RAILS_ENV
-              value: "production"
+              value: production
             - name: DB_ADAPTER
-              value: "postgresql"
-            - name: DB_URL
-              value: "db"
+              value: postgresql
+            - name: DB_HOST
+              value: db
             - name: DB_USER
-              value: "db_user"
+              value: db_user
             - name: DB_PASS
-              value: "db_pass"
+              value: db_pass
             - name: DB_NAME
-              value: "db_name"
+              value: db_name
             # Add any other environment variables your backend needs
           ports:
             - containerPort: 3000
