@@ -78,7 +78,7 @@ spec:
         - name: migrate
           image: ghcr.io/warehog/dej-chochle/pd-backend:develop
           command: ["/bin/sh", "-c"]
-          args: ["bundle exec rails db:migrate"]
+          args: ["env && bundle exec rails db:migrate"]
           env:
             - name: RAILS_ENV
               value: "production"
