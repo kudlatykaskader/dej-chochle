@@ -79,7 +79,7 @@ spec:
           args: ["env && bundle exec rails db:migrate"]
           env:
             - name: RAILS_ENV
-              value: production
+              value: development
             - name: DB_ADAPTER
               value: postgresql
             - name: DB_HOST
@@ -96,7 +96,7 @@ spec:
           image: ghcr.io/warehog/dej-chochle/pd-backend:develop
           env:
             - name: RAILS_ENV
-              value: production
+              value: development
             - name: DB_ADAPTER
               value: postgresql
             - name: DB_HOST
@@ -110,14 +110,13 @@ spec:
             - name: STORAGE_SERVICE
               value: minio
             - name: MINIO_BUCKET
-              value: pd
+              value: default
             - name: MINIO_ENDPOINT
               value: minio:9000
             - name: MINIO_ACCESS_KEY_ID
-              value: admin
+              value: administrator
             - name: MINIO_SECRET_ACCESS_KEY
-              value: admin
-
+              value: administrator
           ports:
             - containerPort: 3000
 
@@ -204,11 +203,11 @@ spec:
             - containerPort: 9001
           env:
             - name: MINIO_ROOT_USER
-              value: admin
+              value: administrator
             - name: MINIO_ROOT_PASSWORD
-              value: admin
+              value: administrator
             - name: MINIO_DEFAULT_BUCKETS
-              value: pd
+              value: default
           volumeMounts:
             - name: pd-dev-minio-data
               mountPath: /data
@@ -218,11 +217,35 @@ spec:
             claimName: pd-dev-minio-pvc
 
 ---
+
+
+---
 apiVersion: v1
 kind: Service
 metadata:
   name: minio
   namespace: pd-dev-ns
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-bucket
+  namespace: pd-dev-ns
+spec:
+  template:
+    spec:
+      containers:
+      - name: create-bucket
+        image: minio/mc
+        command: ["/bin/sh", "-c"]
+        args:
+        - mc config host add myminio http://minio:9000 administrator administrator;
+          mc mb myminio/default;
+          mc anonymous set download myminio/default;
+      restartPolicy: Never
+  backoffLimit: 4
+
+---
 spec:
   selector:
     app: minio
