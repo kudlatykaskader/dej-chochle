@@ -217,14 +217,23 @@ spec:
             claimName: pd-dev-minio-pvc
 
 ---
-
-
----
 apiVersion: v1
 kind: Service
 metadata:
   name: minio
   namespace: pd-dev-ns
+spec:
+  selector:
+    app: minio
+  ports:
+    - name: http
+      protocol: TCP
+      port: 9000
+      targetPort: 9000
+    - name: http
+      protocol: TCP
+      port: 9001
+      targetPort: 9001
 ---
 apiVersion: batch/v1
 kind: Job
