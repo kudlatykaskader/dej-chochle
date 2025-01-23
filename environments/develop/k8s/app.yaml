@@ -33,11 +33,9 @@ spec:
             - name: db-data
               mountPath: /var/lib/postgresql/data
       volumes:
-        - name: db-data
-          emptyDir: {}
-          # For production, replace emptyDir with a PersistentVolumeClaim reference:
-          # persistentVolumeClaim:
-          #   claimName: db-pvc
+        - name: pd-dev-db-data
+          persistentVolumeClaim:
+            claimName: pd-dev-db-pvc
 
 ---
 apiVersion: v1
@@ -73,7 +71,6 @@ spec:
       labels:
         app: backend
     spec:
-      # Init container to run migrations BEFORE the main backend container starts
       initContainers:
         - name: migrate
           imagePullPolicy: Always
@@ -93,8 +90,6 @@ spec:
               value: db_pass
             - name: DB_NAME
               value: db_name
-          # If your Rails container needs RAILS_ENV or other variables, add them here as well.
-
       containers:
         - name: backend
           imagePullPolicy: Always
@@ -112,7 +107,17 @@ spec:
               value: db_pass
             - name: DB_NAME
               value: db_name
-            # Add any other environment variables your backend needs
+            - name: STORAGE_SERVICE
+              value: minio
+            - name: MINIO_BUCKET
+              value: pd
+            - name: MINIO_ENDPOINT
+              value: minio:9000
+            - name: MINIO_ACCESS_KEY_ID
+              value: admin
+            - name: MINIO_SECRET_ACCESS_KEY
+              value: admin
+
           ports:
             - containerPort: 3000
 
@@ -171,3 +176,89 @@ spec:
       protocol: TCP
       port: 80
       targetPort: 80
+
+---
+### 
+# MINIO DEPLOYMENT + SERVICE
+###
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: pd-dev-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+        - name: minio
+          image: quay.io/minio/minio:RELEASE.2025-01-20T14-49-07Z
+          ports:
+            - containerPort: 9000
+            - containerPort: 9001
+          env:
+            - name: MINIO_ROOT_USER
+              value: admin
+            - name: MINIO_ROOT_PASSWORD
+              value: admin
+            - name: MINIO_DEFAULT_BUCKETS
+              value: pd
+          volumeMounts:
+            - name: minio-data
+              mountPath: /data
+      volumes:
+        - name: pd-dev-minio-data
+          persistentVolumeClaim:
+            claimName: pd-dev-minio-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: pd-dev-ns
+spec:
+  selector:
+    app: minio
+  ports:
+    - name: api
+      protocol: TCP
+      port: 9000
+      targetPort: 9000
+    - name: console
+      protocol: TCP
+      port: 9001
+      targetPort: 9001
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pd-dev-minio-pvc
+  namespace: pd-dev-ns
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pd-dev-db-pvc
+  namespace: pd-dev-ns
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
