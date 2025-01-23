@@ -255,6 +255,8 @@ spec:
   backoffLimit: 4
 
 ---
+apiVersion: v1
+kind: Service
 spec:
   selector:
     app: minio
