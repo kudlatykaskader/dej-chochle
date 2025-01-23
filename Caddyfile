@@ -9,4 +9,8 @@ http:// {
     }
     reverse_proxy /api/* backend:3000 {
     }
+
+    reverse_proxy /rails/* backend:3000 {
+
+    }
 }

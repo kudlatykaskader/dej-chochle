@@ -7,8 +7,11 @@ default: &default
 
 development:
   <<: *default
-  adapter: sqlite3
-  database: db/local.sqlite3
+  adapter: <%= ENV['DB_ADAPTER'] %>
+  database: <%= ENV['DB_NAME'] %>
+  host: <%= ENV['DB_HOST'] %>
+  username: <%= ENV['DB_USER'] %>
+  password: <%= ENV['DB_PASS'] %>
 
 production:
   <<: *default

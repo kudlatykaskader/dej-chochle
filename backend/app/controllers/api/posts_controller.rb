@@ -57,9 +57,9 @@ module Api
     end
 
     def generate_presigned_url(attachment)
-      Rails.application.routes.url_helpers.rails_blob_url(
+      Rails.application.routes.url_helpers.rails_blob_path(
         attachment,
-        only_path: false,
+        only_path: true,
         expires_in: 1.hour,
         disposition: "inline"
       )
