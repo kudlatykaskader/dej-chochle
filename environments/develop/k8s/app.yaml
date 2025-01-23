@@ -257,6 +257,9 @@ spec:
 ---
 apiVersion: v1
 kind: Service
+metadata:
+  name: minio
+  namespace: pd-dev-ns
 spec:
   selector:
     app: minio
