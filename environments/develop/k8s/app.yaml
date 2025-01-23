@@ -76,6 +76,7 @@ spec:
       # Init container to run migrations BEFORE the main backend container starts
       initContainers:
         - name: migrate
+          imagePullPolicy: Always
           image: ghcr.io/warehog/dej-chochle/pd-backend:develop
           command: ["/bin/sh", "-c"]
           args: ["env && bundle exec rails db:migrate"]
