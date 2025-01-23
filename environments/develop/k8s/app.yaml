@@ -226,11 +226,11 @@ spec:
   selector:
     app: minio
   ports:
-    - name: http
+    - name: api
       protocol: TCP
       port: 9000
       targetPort: 9000
-    - name: http
+    - name: web
       protocol: TCP
       port: 9001
       targetPort: 9001
