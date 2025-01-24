@@ -112,7 +112,7 @@ spec:
             - name: MINIO_BUCKET
               value: default
             - name: MINIO_ENDPOINT
-              value: minio:9000
+              value: http://minio:9000
             - name: MINIO_ACCESS_KEY_ID
               value: administrator
             - name: MINIO_SECRET_ACCESS_KEY
