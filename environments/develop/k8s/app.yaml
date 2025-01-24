@@ -317,17 +317,11 @@ data:
       admin off
       auto_https disable_redirects
     }
-    # We'll listen on HTTP, port 80 (container default)
-    # and forward requests based on path.
-    http:// {
-      # Route /api/* to backend:3000
-      reverse_proxy /api/* backend:3000
-      
-      # Route /rails/* to backend:3000
-      reverse_proxy /rails/* backend:3000
 
-      # For all other paths, go to frontend:80
-      reverse_proxy frontend:80
+    http:// {
+      reverse_proxy /api/* backend:3000 { }
+      reverse_proxy /rails/* backend:3000 { }
+      reverse_proxy frontend:80 { }
     }
 
 ---
