@@ -198,6 +198,7 @@ spec:
       containers:
         - name: minio
           image: quay.io/minio/minio:RELEASE.2025-01-20T14-49-07Z
+          command: ["server", "/data"]
           ports:
             - containerPort: 9000
             - containerPort: 9001
