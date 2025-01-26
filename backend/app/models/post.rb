@@ -1,11 +1,19 @@
 class Post < ApplicationRecord
   has_many_attached :attachments
 
-  validates :title, presence: true
-  validates :content, presence: true
+  validates :title, :content, presence: true
+  validates :title, :content, format: {
+    with: /\A[^\u0000-\u001F\u007F-\u009F<>]+\z/,
+    message: 'can only contain Unicode characters and cannot include HTML tags'
+  }
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP, message: 'must be a valid email address' }, if: -> { email_notifications }
+  validates :phone_number, numericality: { only_integer: true, message: 'must contain only numbers' }, length: { is: 9, message: 'must be exactly 9 digits long' }, if: -> { phone_notifications }
   # TODO: disable it for the time being - enable when in production
   # validate :one_post_per_minute
   validate :validate_attachments
+
+  scope :for_email_notifications, -> { where(email_notifications: true) }
+  scope :for_phone_notifications, -> { where(phone_notifications: true) }
 
   private
 

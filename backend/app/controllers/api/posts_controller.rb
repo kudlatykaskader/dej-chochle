@@ -15,11 +15,6 @@ module Api
       @post = Post.new(post_params)
 
       if @post.save
-        if params[:post][:attachments]
-          params[:post][:attachments].each do |attachment|
-            @post.attachments.attach(attachment)
-          end
-        end
         render json: post_data(@post), status: :created
       else
         render json: { errors: @post.errors.full_messages }, status: :unprocessable_entity
@@ -35,7 +30,7 @@ module Api
     end
 
     def post_params
-      params.require(:post).permit(:title, :content, attachments: [])
+      params.require(:post).permit(:title, :content, :phone_number, :phone_notifications, :email, :email_notifications, attachments: [])
     end
 
     def post_data(post)
@@ -57,9 +52,9 @@ module Api
     end
 
     def generate_presigned_url(attachment)
-      Rails.application.routes.url_helpers.rails_blob_path(
+      Rails.application.routes.url_helpers.rails_blob_url(
         attachment,
-        only_path: true,
+        only_path: false,
         expires_in: 1.hour,
         disposition: "inline"
       )

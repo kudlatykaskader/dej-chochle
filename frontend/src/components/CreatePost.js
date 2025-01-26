@@ -1,13 +1,24 @@
 import React, { useState } from 'react';
-import { Container, Typography, TextField, Button, Box, Grid, Card, CardMedia, CardContent, IconButton } from '@mui/material';
+import {Container, Typography, TextField, Button, Box, Card, CardMedia, CardContent, IconButton, Alert, FormControlLabel, Checkbox} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BackButton from "./buttons/BackButton";
 import { useNavigate } from "react-router-dom";
 import {createPost} from "./PostApi";
 
+const defaultPost = {
+    title: '',
+    content: '',
+    phone_number: '',
+    phone_notifications: false,
+    email: '',
+    email_notifications: false
+}
+
 const CreatePost = () => {
-    const [post, setPost] = useState({title: '', content: ''});
+    const [post, setPost] = useState(defaultPost);
     const [attachments, setAttachments] = useState([]);
+    const [errors, setErrors] = useState([])
+
     let navigate = useNavigate();
 
     const handleFileChange = (e) => {
@@ -22,9 +33,13 @@ const CreatePost = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         createPost(post, attachments, () => {
-            setPost({title: '', content: ''});
+            setPost(defaultPost);
             setAttachments([]);
             navigate("/")
+        }, (res) => {
+            if (res.response.data.errors) {
+                setErrors(res.response.data.errors)
+            }
         })
     };
 
@@ -39,6 +54,9 @@ const CreatePost = () => {
                 </Box>
             </Box>
             <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
+                {errors.map((error) => {
+                    return <Alert severity="warning" sx={{ mt: 1, boxShadow: '1px 1px 1px gray' }}>{error}</Alert>
+                })}
                 <TextField
                     fullWidth
                     label="Tytuł"
@@ -55,9 +73,47 @@ const CreatePost = () => {
                     rows={4}
                     margin="normal"
                 />
-                <Grid container spacing={2} sx={{ mt: 2 }}>
+                <Box display="flex" alignItems="center" sx={{ mt: 2 }}>
+                    <TextField
+                        label="Numer telefonu"
+                        value={post.phone_number}
+                        onChange={(e) => setPost({...post, phone_number: e.target.value})}
+                        disabled={!post.phone_notifications}
+                        sx={{ flexGrow: 1, marginRight: 1 }}
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={post.phone_notifications}
+                                onChange={(e) => setPost({...post, phone_notifications: e.target.checked})}
+                                color="primary"
+                            />
+                        }
+                        label="Powiadom mnie o przyszłych postach"
+                    />
+                </Box>
+                <Box display="flex" alignItems="center" sx={{ mt: 3 }}>
+                    <TextField
+                        label="Email"
+                        value={post.email}
+                        onChange={(e) => setPost({...post, email: e.target.value})}
+                        disabled={!post.email_notifications}
+                        sx={{ flexGrow: 1, marginRight: 1 }}
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={post.email_notifications}
+                                onChange={(e) => setPost({...post, email_notifications: e.target.checked})}
+                                color="primary"
+                            />
+                        }
+                        label="Powiadom mnie o przyszłych postach"
+                    />
+                </Box>
+                <Box>
                     {attachments.map((file, index) => (
-                        <Grid item xs={12} sm={6} key={index}>
+                        <Box xs={12} sm={6} key={index} sx={{ mt: 2 }}>
                             <Card>
                                 {file.type.startsWith('image/') ? (
                                     <CardMedia
@@ -90,9 +146,9 @@ const CreatePost = () => {
                                     </IconButton>
                                 </CardContent>
                             </Card>
-                        </Grid>
+                        </Box>
                     ))}
-                </Grid>
+                </Box>
                 <Button
                     variant="contained"
                     component="label"
