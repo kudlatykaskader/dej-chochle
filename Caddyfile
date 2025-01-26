@@ -7,10 +7,10 @@ http:// {
     reverse_proxy frontend:80 {
 
     }
-    reverse_proxy /api/* backend:3000 {
+    reverse_proxy /api/* backend:3001 {
     }
 
-    reverse_proxy /rails/* backend:3000 {
+    reverse_proxy /rails/* backend:3001 {
 
     }
 }

@@ -9,7 +9,7 @@ services:
     build: backend/
     image: ghcr.io/warehog/dej-chochle/pd-backend:develop
     ports:
-      - 3000:3000
+      - 3001:3000
     environment:
       RAILS_ENV: development
       DB_ADAPTER: postgresql
