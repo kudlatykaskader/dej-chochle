@@ -13,6 +13,9 @@ const Post = ({post}) => {
                 <Typography variant="h5" color="primary">
                     {post.title}
                 </Typography>
+                <Typography variant="body2" color="text.secondary">
+                    {post.location}
+                </Typography>
                 <Box sx={{m: 'auto 10px'}}>
                     {location.pathname.includes(`/posts/${post.id}`) ?
                         <BackButton/>

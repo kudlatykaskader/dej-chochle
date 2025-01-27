@@ -10,6 +10,7 @@ export const getPosts = (callback) => {
 
 export const createPost = (post, attachments, callback) => {
     const formData = new FormData();
+    formData.append('post[location]', post.location);
     formData.append('post[title]', post.title);
     formData.append('post[content]', post.content);
     attachments.forEach((file) => formData.append('post[attachments][]', file));
