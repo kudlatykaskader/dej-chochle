@@ -17,6 +17,10 @@ jobs:
       image_tag: ${{ steps.determine_tag.outputs.tag }}
 
     steps:
+      - name: Cancell workflow if commit message contains [skip ci]
+        if: contains(github.event.head_commit.message, '[skip ci]')
+        run: exit 78
+
       - name: Check out repository
         uses: actions/checkout@v4
         with:
@@ -86,6 +90,15 @@ jobs:
     runs-on: ubuntu-latest
     needs: [package]
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      
+      - uses: actions-hub/kubectl@master
+        env:
+          KUBE_CONFIG: ${{ secrets.PL_LP_K3S_CONFIG }}
+        with:
+          args: apply -f environments/develop/k8s/app.yaml 
+
       - name: Update manifests
         run: |
           sed -i "s|pd-frontend:.*|pd-frontend:${{ needs.package.outputs.image_tag }}|g" environments/develop/k8s/app.yaml
@@ -96,6 +109,14 @@ jobs:
         with:
           manifests: environments/develop/k8s/app.yaml
           kubeconfig: ${{ secrets.PL_LP_K3S_CONFIG }}
+
+      - name: Commit changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "
+          git add environments/develop/k8s/app.yaml
+          git commit -m "[skip ci] Update manifests"
+          git push origin develop
 
   deploy-prod:
     if: ${{ github.ref == 'refs/heads/prod' || github.event_name == 'workflow_dispatch' }}
