@@ -9,7 +9,7 @@ services:
     entrypoint: >
       /bin/sh -c "
       cd /app;
-      npm install;
+      npm ci;
       npm start;
       "
     volumes:
