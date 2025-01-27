@@ -2,14 +2,24 @@ version: '3.8'
 
 services:
   frontend:
-    build: frontend/
-    image: ghcr.io/warehog/dej-chochle/pd-frontend:develop
+    image: node:22
+    environment:
+      NODE_ENV: development
+      PORT: 80
+    entrypoint: >
+      /bin/sh -c "
+      cd /app;
+      npm install;
+      npm start;
+      "
+    volumes:
+      - ./frontend:/app
 
   backend:
     build: backend/
     image: ghcr.io/warehog/dej-chochle/pd-backend:develop
     ports:
-      - 3000:3000
+      - 3001:3000
     environment:
       RAILS_ENV: development
       DB_ADAPTER: postgresql
