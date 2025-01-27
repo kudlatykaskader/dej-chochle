@@ -1,122 +1,227 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Box, Modal, IconButton } from '@mui/material';
-
+import { Box, Modal, IconButton, Stack, useTheme } from '@mui/material';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
-/* Import the CSS here */
-import './styles.css';
-
 const ImageGallery = ({ attachments }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const theme = useTheme();
 
   if (!attachments || attachments.length === 0) return null;
 
-  // Handlers for previous/next images
+  /** Go to previous image */
   const handlePrev = useCallback(() => {
     setSelectedIndex((prev) => (prev - 1 + attachments.length) % attachments.length);
   }, [attachments]);
 
+  /** Go to next image */
   const handleNext = useCallback(() => {
     setSelectedIndex((prev) => (prev + 1) % attachments.length);
   }, [attachments]);
 
-  // Listen for ArrowLeft/ArrowRight only in fullscreen mode
+  /** Listen for arrow keys only when the modal is open */
   useEffect(() => {
     if (isFullscreen) {
       const handleKeyDown = (e) => {
-        if (e.key === 'ArrowLeft') handlePrev();
-        else if (e.key === 'ArrowRight') handleNext();
+        if (e.key === 'ArrowLeft') {
+          handlePrev();
+        } else if (e.key === 'ArrowRight') {
+          handleNext();
+        }
       };
       window.addEventListener('keydown', handleKeyDown);
       return () => window.removeEventListener('keydown', handleKeyDown);
     }
   }, [isFullscreen, handlePrev, handleNext]);
 
-  // Toggle fullscreen modal
-  const handleFullscreenToggle = () => {
-    setIsFullscreen(!isFullscreen);
-  };
-
-  // Click a thumbnail
   const handleThumbnailClick = (index) => {
     setSelectedIndex(index);
   };
 
-  const currentImage = attachments[selectedIndex];
+  const handleFullscreenToggle = () => {
+    setIsFullscreen(!isFullscreen);
+  };
 
   return (
-    <Box className="image-gallery">
-      {/* Main (non-fullscreen) Image */}
-      <Box className="main-image-wrapper" onClick={handleFullscreenToggle}>
+    <Box sx={{ mt: 2 }}>
+      {/* Main Image Display */}
+      <Box
+        sx={{
+          position: 'relative',
+          height: 300,
+          borderRadius: 2,
+          overflow: 'hidden',
+          cursor: 'pointer',
+          '&:hover .fullscreen-button': {
+            opacity: 1
+          }
+        }}
+        onClick={handleFullscreenToggle}
+      >
         <img
-          className="main-image"
-          src={currentImage.url}
-          alt={currentImage.filename}
+          src={attachments[selectedIndex].url}
+          alt={attachments[selectedIndex].filename}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover'
+          }}
         />
 
-        {/* Fullscreen Overlay Button */}
-        <IconButton className="fullscreen-button">
+        <IconButton
+          className="fullscreen-button"
+          sx={{
+            position: 'absolute',
+            bottom: 8,
+            right: 8,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            color: 'white',
+            opacity: 0.7,
+            transition: 'opacity 0.3s'
+          }}
+        >
           <FullscreenIcon />
         </IconButton>
       </Box>
 
-      {/* Thumbnails (if more than one) */}
+      {/* Thumbnail Strip */}
       {attachments.length > 1 && (
-        <div className="thumbnail-strip">
-          {attachments.map((attachment, index) => {
-            const isSelected = selectedIndex === index;
-            return (
-              <div
-                key={index}
-                onClick={() => handleThumbnailClick(index)}
-                className={`thumbnail-box ${isSelected ? 'selected' : ''}`}
-              >
-                <img
-                  className="thumbnail-image"
-                  src={attachment.url}
-                  alt={attachment.filename}
-                />
-              </div>
-            );
-          })}
-        </div>
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            mt: 1,
+            overflowX: 'auto',
+            py: 1,
+            '&::-webkit-scrollbar': { height: 6 },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: theme.palette.divider,
+              borderRadius: 2
+            }
+          }}
+        >
+          {attachments.map((attachment, index) => (
+            <Box
+              key={index}
+              onClick={() => handleThumbnailClick(index)}
+              sx={{
+                flexShrink: 0,
+                width: 80,
+                height: 60,
+                borderRadius: 1,
+                overflow: 'hidden',
+                cursor: 'pointer',
+                border:
+                  selectedIndex === index
+                    ? `2px solid ${theme.palette.primary.main}`
+                    : 'none',
+                opacity: selectedIndex === index ? 1 : 0.7,
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  opacity: 1
+                }
+              }}
+            >
+              <img
+                src={attachment.url}
+                alt={attachment.filename}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
+                }}
+              />
+            </Box>
+          ))}
+        </Stack>
       )}
 
       {/* Fullscreen Modal */}
       <Modal
         open={isFullscreen}
         onClose={handleFullscreenToggle}
-        className="fullscreen-modal"
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backdropFilter: 'blur(4px)'
+        }}
       >
-        <div className="modal-content">
-          {/* Fullscreen Image */}
+        <Box
+          sx={{
+            position: 'relative',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            outline: 'none'
+          }}
+        >
           <img
-            className="fullscreen-image"
-            src={currentImage.url}
-            alt={currentImage.filename}
+            src={attachments[selectedIndex].url}
+            alt={attachments[selectedIndex].filename}
+            style={{
+              maxWidth: '100%',
+              maxHeight: '80vh',
+              objectFit: 'contain'
+            }}
           />
 
-          {/* Close Button (top-right) */}
-          <IconButton className="close-button" onClick={handleFullscreenToggle}>
+          {/* Close button (top-right) */}
+          <IconButton
+            onClick={handleFullscreenToggle}
+            sx={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              color: 'white'
+            }}
+          >
             <FullscreenExitIcon />
           </IconButton>
 
-          {/* Prev / Next Buttons */}
+          {/* Prev button (left side) */}
           {attachments.length > 1 && (
-            <>
-              <IconButton className="nav-button left" onClick={handlePrev}>
-                <ArrowBackIosNewIcon />
-              </IconButton>
-              <IconButton className="nav-button right" onClick={handleNext}>
-                <ArrowForwardIosIcon />
-              </IconButton>
-            </>
+            <IconButton
+              onClick={handlePrev}
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: 16,
+                transform: 'translateY(-50%)',
+                backgroundColor: 'rgba(0,0,0,0.4)',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'rgba(0,0,0,0.6)'
+                }
+              }}
+            >
+              <ArrowBackIosNewIcon />
+            </IconButton>
           )}
-        </div>
+
+          {/* Next button (right side) */}
+          {attachments.length > 1 && (
+            <IconButton
+              onClick={handleNext}
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                right: 16,
+                transform: 'translateY(-50%)',
+                backgroundColor: 'rgba(0,0,0,0.4)',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'rgba(0,0,0,0.6)'
+                }
+              }}
+            >
+              <ArrowForwardIosIcon />
+            </IconButton>
+          )}
+        </Box>
       </Modal>
     </Box>
   );

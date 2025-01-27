@@ -8,7 +8,7 @@ import TimelineContent from '@mui/lab/TimelineContent';
 import { Paper, Typography, useTheme, useMediaQuery } from '@mui/material';
 import PlaceIcon from '@mui/icons-material/Place';
 
-import ImageGallery from './ImageGallery';
+import ImageGallery from '../image-gallery/ImageGallery';
 import './TimelineItem.css';  // <-- Import the CSS file
 
 const TimelineItem = ({ time, place, header, paragraph, attachments }) => {
