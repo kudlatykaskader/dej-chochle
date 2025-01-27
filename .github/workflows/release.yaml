@@ -54,15 +54,12 @@ jobs:
           fi
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-      - name: Create production git tag
-        if: |
-          env.BRANCH_NAME == 'prod' &&
-          steps.get_prod_version.outputs.hasNextVersion == 'true'
+      - name: Create git tag
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git tag ${{ steps.get_prod_version.outputs.version }}
-          git push origin ${{ steps.get_prod_version.outputs.version }}
+          git tag ${{ steps.determine_tag.outputs.tag }}
+          git push origin ${{ steps.determine_tag.outputs.tag }}
 
       - name: Docker login
         uses: docker/login-action@v3
@@ -105,15 +102,7 @@ jobs:
         env:
           KUBE_CONFIG: ${{ secrets.PL_LP_K3S_CONFIG }}
         with:
-          args: apply -f environments/develop/k8s/app.yaml 
-      
-      - name: Commit changes
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add environments/develop/k8s/app.yaml
-          git commit -m "[skip ci] Update manifests"
-          git push origin develop
+          args: apply -f environments/develop/k8s/app.yaml
 
   # deploy-prod:
   #   if: ${{ github.ref == 'refs/heads/prod' || github.event_name == 'workflow_dispatch' }}
