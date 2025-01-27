@@ -15,11 +15,6 @@ module Api
       @post = Post.new(post_params)
 
       if @post.save
-        if params[:post][:attachments]
-          params[:post][:attachments].each do |attachment|
-            @post.attachments.attach(attachment)
-          end
-        end
         render json: post_data(@post), status: :created
       else
         render json: { errors: @post.errors.full_messages }, status: :unprocessable_entity
