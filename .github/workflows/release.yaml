@@ -93,23 +93,18 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
       
-      - uses: actions-hub/kubectl@master
-        env:
-          KUBE_CONFIG: ${{ secrets.PL_LP_K3S_CONFIG }}
-        with:
-          args: apply -f environments/develop/k8s/app.yaml 
-
       - name: Update manifests
         run: |
           sed -i "s|pd-frontend:.*|pd-frontend:${{ needs.package.outputs.image_tag }}|g" environments/develop/k8s/app.yaml
           sed -i "s|pd-backend:.*|pd-backend:${{ needs.package.outputs.image_tag }}|g" environments/develop/k8s/app.yaml
-      
-      - name: Deploy to Kubernetes
-        uses: azure/k8s-deploy@v4
-        with:
-          manifests: environments/develop/k8s/app.yaml
-          kubeconfig: ${{ secrets.PL_LP_K3S_CONFIG }}
 
+      - name: Deploy to Kubernetes
+        uses: actions-hub/kubectl@master
+        env:
+          KUBE_CONFIG: ${{ secrets.PL_LP_K3S_CONFIG }}
+        with:
+          args: apply -f environments/develop/k8s/app.yaml 
+      
       - name: Commit changes
         run: |
           git config --global user.name "GitHub Actions"
@@ -118,27 +113,27 @@ jobs:
           git commit -m "[skip ci] Update manifests"
           git push origin develop
 
-  deploy-prod:
-    if: ${{ github.ref == 'refs/heads/prod' || github.event_name == 'workflow_dispatch' }}
-    environment: prod
-    runs-on: ubuntu-latest
-    needs: [package]
-    steps:
-      - name: Validate production version
-        run: |
-          if [[ ! "${{ needs.package.outputs.image_tag }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::Invalid production version format!"
-            exit 1
-          fi
+  # deploy-prod:
+  #   if: ${{ github.ref == 'refs/heads/prod' || github.event_name == 'workflow_dispatch' }}
+  #   environment: prod
+  #   runs-on: ubuntu-latest
+  #   needs: [package]
+  #   steps:
+  #     - name: Validate production version
+  #       run: |
+  #         if [[ ! "${{ needs.package.outputs.image_tag }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  #           echo "::error::Invalid production version format!"
+  #           exit 1
+  #         fi
 
-      - name: Update manifests
-        run: |
-          sed -i "s|pd-frontend:.*|pd-frontend:${{ needs.package.outputs.image_tag }}|g" environments/prod/k8s/app.yaml
-          sed -i "s|pd-backend:.*|pd-backend:${{ needs.package.outputs.image_tag }}|g" environments/prod/k8s/app.yaml
+  #     - name: Update manifests
+  #       run: |
+  #         sed -i "s|pd-frontend:.*|pd-frontend:${{ needs.package.outputs.image_tag }}|g" environments/prod/k8s/app.yaml
+  #         sed -i "s|pd-backend:.*|pd-backend:${{ needs.package.outputs.image_tag }}|g" environments/prod/k8s/app.yaml
 
-      - name: Deploy to Kubernetes
-        uses: azure/k8s-deploy@v4
-        with:
-          manifests: environments/prod/k8s/app.yaml
-          kubeconfig: ${{ secrets.PL_LP_K3S_CONFIG }}
-          strategy: canary
+  #     - name: Deploy to Kubernetes
+  #       uses: azure/k8s-deploy@v4
+  #       with:
+  #         manifests: environments/prod/k8s/app.yaml
+  #         kubeconfig: ${{ secrets.PL_LP_K3S_CONFIG }}
+  #         strategy: canary
