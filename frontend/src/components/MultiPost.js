@@ -34,7 +34,6 @@ const MultiPost = () => {
                         header={ post.title }
                         paragraph="The spoon is carefully crafted from quality wood."
                         attachments={ post.attachments }
-                        // imageUrl={ post.attachments[0].url }
                     />
                 ))}
             </Timeline>
