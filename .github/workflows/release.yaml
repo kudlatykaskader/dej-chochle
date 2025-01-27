@@ -8,93 +8,116 @@ on:
 jobs:
   package:
     runs-on: ubuntu-latest
-
     permissions:
-      contents: read
+      contents: write
       packages: write
-
     env:
       BRANCH_NAME: ${{ github.ref_name }}
+    outputs:
+      image_tag: ${{ steps.determine_tag.outputs.tag }}
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get next version
-        id: get_next_version
+      # Production versioning (semantic)
+      - name: Get production version
+        id: get_prod_version
+        if: env.BRANCH_NAME == 'prod'
         uses: thenativeweb/get-next-version@main
         with:
-          prefix: 'v' # optional, defaults to ''
+          prefix: 'v'
 
-      - name: Show the next version
+      # Development versioning (branch-based)
+      - name: Generate development version
+        id: get_dev_version
+        if: env.BRANCH_NAME == 'develop'
         run: |
-          echo ${{ steps.get_next_version.outputs.version }}
-          echo ${{ steps.get_next_version.outputs.hasNextVersion }}
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          DATE=$(date +'%Y%m%d')
+          echo "version=dev-$DATE-${{ github.run_number }}-$SHORT_SHA" >> $GITHUB_OUTPUT
 
-      - name: Docker login to GHCR
-        if: ${{ env.BRANCH_NAME != 'prod' }}
-        uses: docker/login-action@v2
+      - name: Determine image tag
+        id: determine_tag
+        run: |
+          if [ "$BRANCH_NAME" = "prod" ]; then
+            TAG="${{ steps.get_prod_version.outputs.version }}"
+          else
+            TAG="${{ steps.get_dev_version.outputs.version }}"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Create production git tag
+        if: |
+          env.BRANCH_NAME == 'prod' &&
+          steps.get_prod_version.outputs.hasNextVersion == 'true'
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git tag ${{ steps.get_prod_version.outputs.version }}
+          git push origin ${{ steps.get_prod_version.outputs.version }}
+
+      - name: Docker login
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & push Docker image (Frontend)
-        if: ${{ env.BRANCH_NAME != 'prod' }}
+      - name: Build & push frontend
+        if: env.BRANCH_NAME != 'prod'
         run: |
-          IMAGE_NAME=ghcr.io/${{ github.repository }}/pd-frontend:${{ env.BRANCH_NAME }}
-          echo "Building Frontend image => $IMAGE_NAME"
-          cd frontend
-          docker build -t $IMAGE_NAME .
-          docker push $IMAGE_NAME
-      
-      - name: Build and push Docker image (Backend)
-        run: |
-          IMAGE_NAME=ghcr.io/${{ github.repository }}/pd-backend:${{ env.BRANCH_NAME }}
-          echo "Building Backend image => $IMAGE_NAME"
-          docker build -t $IMAGE_NAME ./backend
-          docker push $IMAGE_NAME
+          IMAGE=ghcr.io/${{ github.repository }}/pd-frontend:${{ steps.determine_tag.outputs.tag }}
+          docker build -t $IMAGE ./frontend
+          docker push $IMAGE
 
-  # -----------------------
-  # 5) Deploy to DEVELOP
-  # -----------------------
+      - name: Build & push backend
+        run: |
+          IMAGE=ghcr.io/${{ github.repository }}/pd-backend:${{ steps.determine_tag.outputs.tag }}
+          docker build -t $IMAGE ./backend
+          docker push $IMAGE
+
   deploy-develop:
-    # Deploy if on the develop branch OR manually triggered
     if: ${{ github.ref == 'refs/heads/develop' }}
     environment: develop
     runs-on: ubuntu-latest
-    needs:
-      - package
-
+    needs: [package]
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v2
+      - name: Update manifests
+        run: |
+          sed -i "s|pd-frontend:.*|pd-frontend:${{ needs.package.outputs.image_tag }}|g" environments/develop/k8s/app.yaml
+          sed -i "s|pd-backend:.*|pd-backend:${{ needs.package.outputs.image_tag }}|g" environments/develop/k8s/app.yaml
       
-      - uses: actions-hub/kubectl@master
-        env:
-          KUBE_CONFIG: ${{ secrets.PL_LP_K3S_CONFIG }}
+      - name: Deploy to Kubernetes
+        uses: azure/k8s-deploy@v4
         with:
-          args: apply -f environments/develop/k8s/app.yaml 
+          manifests: environments/develop/k8s/app.yaml
+          kubeconfig: ${{ secrets.PL_LP_K3S_CONFIG }}
 
-  # -----------------------
-  # 6) Deploy to PROD
-  # -----------------------
   deploy-prod:
-    # Deploy if on the prod branch OR manually triggered
     if: ${{ github.ref == 'refs/heads/prod' || github.event_name == 'workflow_dispatch' }}
     environment: prod
     runs-on: ubuntu-latest
-    needs:
-      - package
-
+    needs: [package]
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v2
+      - name: Validate production version
+        run: |
+          if [[ ! "${{ needs.package.outputs.image_tag }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Invalid production version format!"
+            exit 1
+          fi
 
-      - uses: actions-hub/kubectl@master
-        env:
-          KUBE_CONFIG: ${{ secrets.PL_LP_K3S_CONFIG }}
+      - name: Update manifests
+        run: |
+          sed -i "s|pd-frontend:.*|pd-frontend:${{ needs.package.outputs.image_tag }}|g" environments/prod/k8s/app.yaml
+          sed -i "s|pd-backend:.*|pd-backend:${{ needs.package.outputs.image_tag }}|g" environments/prod/k8s/app.yaml
+
+      - name: Deploy to Kubernetes
+        uses: azure/k8s-deploy@v4
         with:
-          args: apply -f environments/prod/k8s/app.yaml
+          manifests: environments/prod/k8s/app.yaml
+          kubeconfig: ${{ secrets.PL_LP_K3S_CONFIG }}
+          strategy: canary
