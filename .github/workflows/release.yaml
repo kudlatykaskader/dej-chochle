@@ -108,7 +108,7 @@ jobs:
       - name: Commit changes
         run: |
           git config --global user.name "GitHub Actions"
-          git config --global user.email "
+          git config --global user.email "workflow-bot@github.com"
           git add environments/develop/k8s/app.yaml
           git commit -m "[skip ci] Update manifests"
           git push origin develop
