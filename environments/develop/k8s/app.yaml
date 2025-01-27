@@ -74,7 +74,7 @@ spec:
       initContainers:
         - name: migrate
           imagePullPolicy: Always
-          image: ghcr.io/warehog/dej-chochle/pd-backend:develop
+          image: ghcr.io/warehog/dej-chochle/pd-backend:dev-20250127-37-984b35e
           command: ["/bin/sh", "-c"]
           args: ["env && bundle exec rails db:migrate"]
           env:
@@ -93,7 +93,7 @@ spec:
       containers:
         - name: backend
           imagePullPolicy: Always
-          image: ghcr.io/warehog/dej-chochle/pd-backend:develop
+          image: ghcr.io/warehog/dej-chochle/pd-backend:dev-20250127-37-984b35e
           env:
             - name: RAILS_ENV
               value: development
@@ -156,7 +156,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ghcr.io/warehog/dej-chochle/pd-frontend:develop
+          image: ghcr.io/warehog/dej-chochle/pd-frontend:dev-20250127-37-984b35e
           imagePullPolicy: Always
           ports:
             - containerPort: 80
