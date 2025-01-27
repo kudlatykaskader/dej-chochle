@@ -88,6 +88,8 @@ jobs:
     if: ${{ github.ref == 'refs/heads/develop' }}
     environment: develop
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     needs: [package]
     steps:
       - name: Check out repository
