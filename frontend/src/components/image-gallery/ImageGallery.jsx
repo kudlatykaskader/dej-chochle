@@ -10,8 +10,6 @@ const ImageGallery = ({ attachments }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const theme = useTheme();
 
-  if (!attachments || attachments.length === 0) return null;
-
   /** Go to previous image */
   const handlePrev = useCallback(() => {
     setSelectedIndex((prev) => (prev - 1 + attachments.length) % attachments.length);
@@ -24,26 +22,37 @@ const ImageGallery = ({ attachments }) => {
 
   /** Listen for arrow keys only when the modal is open */
   useEffect(() => {
-    if (isFullscreen) {
-      const handleKeyDown = (e) => {
-        if (e.key === 'ArrowLeft') {
-          handlePrev();
-        } else if (e.key === 'ArrowRight') {
-          handleNext();
-        }
-      };
-      window.addEventListener('keydown', handleKeyDown);
-      return () => window.removeEventListener('keydown', handleKeyDown);
-    }
+    if (!isFullscreen) return; // If not fullscreen, do nothing
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowLeft') {
+        handlePrev();
+      } else if (e.key === 'ArrowRight') {
+        handleNext();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isFullscreen, handlePrev, handleNext]);
+
+  // --- AFTER HOOKS, check if attachments is empty ---
+  if (!attachments || attachments.length === 0) {
+    // We still call all hooks above to keep order consistent.
+    return null;
+  }
+
+  // --- EVENT HANDLERS ---
 
   const handleThumbnailClick = (index) => {
     setSelectedIndex(index);
   };
 
   const handleFullscreenToggle = () => {
-    setIsFullscreen(!isFullscreen);
+    setIsFullscreen((prev) => !prev);
   };
+
+  // --- RENDER ---
 
   return (
     <Box sx={{ mt: 2 }}>
@@ -56,8 +65,8 @@ const ImageGallery = ({ attachments }) => {
           overflow: 'hidden',
           cursor: 'pointer',
           '&:hover .fullscreen-button': {
-            opacity: 1
-          }
+            opacity: 1,
+          },
         }}
         onClick={handleFullscreenToggle}
       >
@@ -67,7 +76,7 @@ const ImageGallery = ({ attachments }) => {
           style={{
             width: '100%',
             height: '100%',
-            objectFit: 'cover'
+            objectFit: 'cover',
           }}
         />
 
@@ -80,7 +89,7 @@ const ImageGallery = ({ attachments }) => {
             backgroundColor: 'rgba(0,0,0,0.5)',
             color: 'white',
             opacity: 0.7,
-            transition: 'opacity 0.3s'
+            transition: 'opacity 0.3s',
           }}
         >
           <FullscreenIcon />
@@ -99,8 +108,8 @@ const ImageGallery = ({ attachments }) => {
             '&::-webkit-scrollbar': { height: 6 },
             '&::-webkit-scrollbar-thumb': {
               backgroundColor: theme.palette.divider,
-              borderRadius: 2
-            }
+              borderRadius: 2,
+            },
           }}
         >
           {attachments.map((attachment, index) => (
@@ -114,15 +123,14 @@ const ImageGallery = ({ attachments }) => {
                 borderRadius: 1,
                 overflow: 'hidden',
                 cursor: 'pointer',
-                border:
-                  selectedIndex === index
-                    ? `2px solid ${theme.palette.primary.main}`
-                    : 'none',
+                border: selectedIndex === index
+                  ? `2px solid ${theme.palette.primary.main}`
+                  : 'none',
                 opacity: selectedIndex === index ? 1 : 0.7,
                 transition: 'all 0.2s ease',
                 '&:hover': {
-                  opacity: 1
-                }
+                  opacity: 1,
+                },
               }}
             >
               <img
@@ -131,7 +139,7 @@ const ImageGallery = ({ attachments }) => {
                 style={{
                   width: '100%',
                   height: '100%',
-                  objectFit: 'cover'
+                  objectFit: 'cover',
                 }}
               />
             </Box>
@@ -147,7 +155,7 @@ const ImageGallery = ({ attachments }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          backdropFilter: 'blur(4px)'
+          backdropFilter: 'blur(4px)',
         }}
       >
         <Box
@@ -155,7 +163,7 @@ const ImageGallery = ({ attachments }) => {
             position: 'relative',
             maxWidth: '90vw',
             maxHeight: '90vh',
-            outline: 'none'
+            outline: 'none',
           }}
         >
           <img
@@ -164,7 +172,7 @@ const ImageGallery = ({ attachments }) => {
             style={{
               maxWidth: '100%',
               maxHeight: '80vh',
-              objectFit: 'contain'
+              objectFit: 'contain',
             }}
           />
 
@@ -176,7 +184,7 @@ const ImageGallery = ({ attachments }) => {
               top: 8,
               right: 8,
               backgroundColor: 'rgba(0,0,0,0.5)',
-              color: 'white'
+              color: 'white',
             }}
           >
             <FullscreenExitIcon />
@@ -194,8 +202,8 @@ const ImageGallery = ({ attachments }) => {
                 backgroundColor: 'rgba(0,0,0,0.4)',
                 color: 'white',
                 '&:hover': {
-                  backgroundColor: 'rgba(0,0,0,0.6)'
-                }
+                  backgroundColor: 'rgba(0,0,0,0.6)',
+                },
               }}
             >
               <ArrowBackIosNewIcon />
@@ -214,8 +222,8 @@ const ImageGallery = ({ attachments }) => {
                 backgroundColor: 'rgba(0,0,0,0.4)',
                 color: 'white',
                 '&:hover': {
-                  backgroundColor: 'rgba(0,0,0,0.6)'
-                }
+                  backgroundColor: 'rgba(0,0,0,0.6)',
+                },
               }}
             >
               <ArrowForwardIosIcon />
