@@ -1,131 +1,112 @@
 import React, { useState } from 'react';
-import { Container, Typography, TextField, Button, Box, Grid, Card, CardMedia, CardContent, IconButton } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Box
+} from '@mui/material';
 import BackButton from "./buttons/BackButton";
 import { useNavigate } from "react-router-dom";
-import {createPost} from "./PostApi";
+import { createPost } from "./PostApi";
+import AttachmentUploader from "./AttachmentUploader";
+import AttachmentsGrid from "./AttachmentsGrid";
 
 const CreatePost = () => {
-    const [post, setPost] = useState({location: '', title: '', content: ''});
-    const [attachments, setAttachments] = useState([]);
-    let navigate = useNavigate();
+  const [post, setPost] = useState({ location: '', title: '', content: '' });
+  const [attachments, setAttachments] = useState([]);
+  const navigate = useNavigate();
 
-    const handleFileChange = (e) => {
-        const files = Array.from(e.target.files);
-        setAttachments([...attachments, ...files]);
-    };
+  /**
+   * Handler for adding new files (either from the file system or the camera).
+   * We merge them into our existing attachments state.
+   */
+  const handleAddAttachments = (newFiles) => {
+    setAttachments(prev => [...prev, ...newFiles]);
+  };
 
-    const handleRemoveFile = (index) => {
-        setAttachments(attachments.filter((_, i) => i !== index));
-    };
+  /**
+   * Remove a single attachment from the list by index.
+   */
+  const handleRemoveFile = (index) => {
+    setAttachments(prev => prev.filter((_, i) => i !== index));
+  };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        createPost(post, attachments, () => {
-            setPost({location: '', title: '', content: ''});
-            setAttachments([]);
-            navigate("/")
-        })
-    };
+  /**
+   * Submit the post: send data + attachments to the server.
+   */
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-    return (
-        <Container maxWidth="sm" sx={{ mt: 4 }}>
-            <Box display="flex" justifyContent="space-between">
-                <Typography variant="h2" color="primary" gutterBottom>
-                    Stwórz nowy post
-                </Typography>
-                <Box sx={{m: 'auto 10px'}}>
-                    <BackButton/>
-                </Box>
-            </Box>
-            <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
-                <TextField
-                    fullWidth
-                    label="Lokalizacja"
-                    value={post.location}
-                    onChange={(e) => setPost({...post, location: e.target.value})}
-                    margin="normal"
-                />
-                <TextField
-                    fullWidth
-                    label="Tytuł"
-                    value={post.title}
-                    onChange={(e) => setPost({...post, title: e.target.value})}
-                    margin="normal"
-                />
-                <TextField
-                    fullWidth
-                    label="Treść"
-                    value={post.content}
-                    onChange={(e) => setPost({...post, content: e.target.value})}
-                    multiline
-                    rows={4}
-                    margin="normal"
-                />
-                <Grid container spacing={2} sx={{ mt: 2 }}>
-                    {attachments.map((file, index) => (
-                        <Grid item xs={12} sm={6} key={index}>
-                            <Card>
-                                {file.type.startsWith('image/') ? (
-                                    <CardMedia
-                                        component="img"
-                                        height="140"
-                                        image={URL.createObjectURL(file)}
-                                        alt={file.name}
-                                    />
-                                ) : file.type.startsWith('video/') ? (
-                                    <CardMedia
-                                        component="video"
-                                        height="140"
-                                        controls
-                                        src={URL.createObjectURL(file)}
-                                        alt={file.name}
-                                    />
-                                ) : (
-                                    <CardContent>
-                                        <Typography variant="body2" color="text.secondary">
-                                            {file.name}
-                                        </Typography>
-                                    </CardContent>
-                                )}
-                                <CardContent>
-                                    <IconButton
-                                        color="secondary"
-                                        onClick={() => handleRemoveFile(index)}
-                                    >
-                                        <DeleteIcon />
-                                    </IconButton>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
-                <Button
-                    variant="contained"
-                    component="label"
-                    color="primary"
-                    sx={{ mt: 2 }}
-                >
-                    Dodaj załączniki
-                    <input
-                        type="file"
-                        multiple
-                        hidden
-                        onChange={handleFileChange}
-                    />
-                </Button>
-                <Button
-                    type="submit"
-                    variant="contained"
-                    color="secondary"
-                    fullWidth
-                    sx={{ mt: 4 }}
-                >
-                    Wyślij
-                </Button>
-            </Box>
-        </Container>
-    );
+    createPost(post, attachments, () => {
+      setPost({ location: '', title: '', content: '' });
+      setAttachments([]);
+      navigate("/");
+    });
+  };
+
+  return (
+    <Container maxWidth="sm" sx={{ mt: 4 }}>
+      <Box display="flex" justifyContent="space-between">
+        <Typography variant="h2" color="primary" gutterBottom>
+          Stwórz nowy post
+        </Typography>
+        <Box sx={{ m: 'auto 10px' }}>
+          <BackButton />
+        </Box>
+      </Box>
+
+      <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
+        {/* LOCATION */}
+        <TextField
+          fullWidth
+          label="Lokalizacja"
+          value={post.location}
+          onChange={(e) => setPost({ ...post, location: e.target.value })}
+          margin="normal"
+        />
+
+        {/* TITLE */}
+        <TextField
+          fullWidth
+          label="Tytuł"
+          value={post.title}
+          onChange={(e) => setPost({ ...post, title: e.target.value })}
+          margin="normal"
+        />
+
+        {/* CONTENT */}
+        <TextField
+          fullWidth
+          label="Treść"
+          value={post.content}
+          onChange={(e) => setPost({ ...post, content: e.target.value })}
+          multiline
+          rows={4}
+          margin="normal"
+        />
+
+        {/* Attachments Preview Grid */}
+        <AttachmentsGrid
+          attachments={attachments}
+          onRemoveFile={handleRemoveFile}
+        />
+
+        {/* Attachment Uploader (File & Camera) */}
+        <AttachmentUploader onAddFiles={handleAddAttachments} />
+
+        <Button
+          type="submit"
+          variant="contained"
+          color="secondary"
+          fullWidth
+          sx={{ mt: 4 }}
+        >
+          Wyślij
+        </Button>
+      </Box>
+    </Container>
+  );
 };
 
 export default CreatePost;

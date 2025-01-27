@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Grid, Box } from '@mui/material';
-import Post from "./Post";
+import { Container, Typography, Box } from '@mui/material';
 import CreateButton from "./buttons/CreateButton";
 import { getPosts } from "./PostApi";
 
 
 // SpoonJourney.js
-import Timeline from './Timeline';
-import TimelineItem from './TimelineItem';
+import Timeline from './timeline/Timeline';
+import TimelineItem from './timeline/TimelineItem';
 
 const MultiPost = () => {
     const [posts, setPosts] = useState([]);
