@@ -1,0 +1,106 @@
+/* TimelineItem.css */
+
+/* Main TimelineItem container */
+.timeline-item {
+    min-height: 0;
+    display: flex;
+    align-items: flex-start;
+  }
+  
+  /* Remove the default vertical line on the left (MUI's pseudo-element) */
+  .timeline-item:before {
+    flex: 0;
+    padding: 0;
+  }
+  
+  /* If on a mobile breakpoint, stack content vertically */
+  .timeline-item.mobile {
+    flex-direction: column;
+  }
+  
+  /* --- TIMELINE SEPARATOR --- */
+  .timeline-separator {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0; /* override default spacing from MUI if needed */
+  }
+  
+  .timeline-separator.mobile {
+    flex-direction: row;
+    width: 100%;
+    margin-bottom: 8px; /* ~1 x theme spacing */
+    padding: 0 16px; /* ~2 x theme spacing */
+  }
+  
+  /* Dot style (around the PlaceIcon) */
+  .timeline-dot {
+    padding: 8px;
+    margin: 0; /* remove default MUI margin if you like */
+    box-shadow: 0px 2px 4px rgba(0,0,0,0.2); /* approximate theme.shadows[2] */
+    background-color: #fff; /* We'll override to MUI's theme in JSX if desired */
+    transition: box-shadow 0.2s;
+  }
+  
+  .timeline-dot.mobile {
+    margin: 0 auto; /* center dot on mobile */
+  }
+  
+  /* Connector line (vertical) */
+  .timeline-connector {
+    background-color: #e0e0e0; /* approximate theme.palette.divider */
+    height: 100%;
+    width: 2px;
+    flex-grow: 1;
+  }
+  
+  /* --- TIMELINE CONTENT / PAPER --- */
+  .timeline-content {
+    flex: 1;
+    width: 100%;
+    padding: 16px; /* ~2 x theme spacing */
+  }
+  
+  .timeline-content.mobile {
+    padding-top: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  
+  /* The Paper wrapper for your content */
+  .timeline-paper {
+    padding: 24px; /* ~3 x theme spacing */
+    border-radius: 8px;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .timeline-paper:hover {
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.2); /* approximate theme.shadows[4] */
+  }
+  
+  .timeline-paper.mobile {
+    padding: 16px; /* ~2 x theme spacing */
+    margin-top: 8px;
+  }
+  
+  /* --- TEXT STYLES --- */
+  .time-place {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* small gap between date, bullet, and location */
+    margin-bottom: 8px;
+    color: #666; /* approximate "text.secondary" color */
+  }
+  
+  .separator-dot {
+    color: #1976d2; /* 'primary.main' in MUI by default */
+  }
+  
+  /* Optional: margin tweaks for your headings/paragraphs */
+  .header {
+    margin-bottom: 8px;
+  }
+  
+  .paragraph {
+    margin-bottom: 16px;
+  }
+  
