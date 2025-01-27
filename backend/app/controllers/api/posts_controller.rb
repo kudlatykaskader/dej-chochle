@@ -35,12 +35,13 @@ module Api
     end
 
     def post_params
-      params.require(:post).permit(:title, :content, attachments: [])
+      params.require(:post).permit(:location, :title, :content, attachments: [])
     end
 
     def post_data(post)
       {
         id: post.id,
+        location: post.location,
         title: post.title,
         content: post.content,
         attachments: post.attachments.map do |attachment|

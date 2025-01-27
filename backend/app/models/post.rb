@@ -1,6 +1,7 @@
 class Post < ApplicationRecord
   has_many_attached :attachments
 
+  validates :location, presence: true
   validates :title, presence: true
   validates :content, presence: true
   # TODO: disable it for the time being - enable when in production

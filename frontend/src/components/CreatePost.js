@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import {createPost} from "./PostApi";
 
 const CreatePost = () => {
-    const [post, setPost] = useState({title: '', content: ''});
+    const [post, setPost] = useState({location: '', title: '', content: ''});
     const [attachments, setAttachments] = useState([]);
     let navigate = useNavigate();
 
@@ -22,7 +22,7 @@ const CreatePost = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         createPost(post, attachments, () => {
-            setPost({title: '', content: ''});
+            setPost({location: '', title: '', content: ''});
             setAttachments([]);
             navigate("/")
         })
@@ -39,6 +39,13 @@ const CreatePost = () => {
                 </Box>
             </Box>
             <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
+                <TextField
+                    fullWidth
+                    label="Lokalizacja"
+                    value={post.location}
+                    onChange={(e) => setPost({...post, location: e.target.value})}
+                    margin="normal"
+                />
                 <TextField
                     fullWidth
                     label="Tytuł"
