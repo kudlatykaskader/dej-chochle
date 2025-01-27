@@ -2,7 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Container, Typography, Grid, Box } from '@mui/material';
 import Post from "./Post";
 import CreateButton from "./buttons/CreateButton";
-import {getPosts} from "./PostApi";
+import { getPosts } from "./PostApi";
+
+
+// SpoonJourney.js
+import Timeline from './Timeline';
+import TimelineItem from './TimelineItem';
 
 const MultiPost = () => {
     const [posts, setPosts] = useState([]);
@@ -17,17 +22,21 @@ const MultiPost = () => {
                 <Typography variant="h1" color="primary" gutterBottom>
                     Wszystkie Posty
                 </Typography>
-                <Box sx={{m: 'auto 10px'}}>
-                    <CreateButton/>
+                <Box sx={{ m: 'auto 10px' }}>
+                    <CreateButton />
                 </Box>
             </Box>
-            <Grid container spacing={3}>
-                {posts.map((post) => (
-                    <Grid item xs={12} key={post.id}>
-                        <Post post={post} />
-                    </Grid>
+            <Timeline>
+                {posts.map((post, index) => (
+                    <TimelineItem key={index}
+                        time={ post.created_at }
+                        place={ post.location }
+                        header={ post.title }
+                        paragraph="The spoon is carefully crafted from quality wood."
+                        attachments={ post.attachments }
+                    />
                 ))}
-            </Grid>
+            </Timeline>
         </Container>
     );
 };
