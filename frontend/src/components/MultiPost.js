@@ -27,13 +27,14 @@ const MultiPost = () => {
                 </Box>
             </Box>
             <Timeline>
-                {posts.map((post) => (
-                    <TimelineItem
-                        time="2025-01-10"
+                {posts.map((post, index) => (
+                    <TimelineItem key={index}
+                        time={ post.created_at }
                         place={ post.location }
                         header={ post.title }
                         paragraph="The spoon is carefully crafted from quality wood."
-                        imageUrl="https://zzaoceanu.com/wp-content/uploads/2023/10/main-market-4981934_1920.jpg"
+                        attachments={ post.attachments }
+                        // imageUrl={ post.attachments[0].url }
                     />
                 ))}
             </Timeline>

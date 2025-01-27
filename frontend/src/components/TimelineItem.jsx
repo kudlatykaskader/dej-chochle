@@ -7,7 +7,7 @@ import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
 import Typography from '@mui/material/Typography';
 
-const TimelineItem = ({ time, place, header, paragraph, imageUrl }) => {
+const TimelineItem = ({ time, place, header, paragraph, attachments }) => {
   return (
     <TimelineItemMUI>
       <TimelineSeparator>
@@ -30,13 +30,10 @@ const TimelineItem = ({ time, place, header, paragraph, imageUrl }) => {
           {paragraph}
         </Typography>
 
-        {imageUrl && (
-          <img
-            src={imageUrl}
-            alt={`${header} image`}
-            style={{ maxWidth: '100%', marginTop: 8 }}
-          />
-        )}
+        {/* Attachments */}
+        {attachments.map((attachment, index) => (
+          <img key={index} src={attachment.url} alt={attachment.filename} style={{ width: '100%' }} />
+        ))}
       </TimelineContent>
     </TimelineItemMUI>
   );
