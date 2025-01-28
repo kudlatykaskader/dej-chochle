@@ -1,4 +1,3 @@
-// CreatePost.jsx
 import React, { useState, useEffect } from 'react';
 import {
   Container,
@@ -6,19 +5,31 @@ import {
   TextField,
   Button,
   Box,
+  Paper,
 } from '@mui/material';
 import BackButton from "../buttons/BackButton";
 import { useNavigate } from "react-router-dom";
 import { createPost } from "../PostApi";
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 // Our extracted components
 import AttachmentsGrid from "./AttachmentsGrid";
 import MediaSelectionButtons from "./MediaSelectionButtons";
 import UploadProgressModal from "./UploadProgressModal";
 import SuccessSnackbar from "./SuccessSnackbar";
+import placeholder from './placeholder.png';
+
+
+const customIcon = L.icon({
+  iconUrl: placeholder,
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32]
+});
 
 const CreatePost = () => {
-  const [post, setPost] = useState({ location: '', title: 'blank', content: '' });
+  const [post, setPost] = useState({ location: '', title: 'blank', content: '', lat: '', lng: '' });
   const [attachments, setAttachments] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -26,7 +37,6 @@ const CreatePost = () => {
 
   const navigate = useNavigate();
 
-  // Prevent window close / navigation during upload
   useEffect(() => {
     const handleBeforeUnload = (e) => {
       if (blockNavigation) {
@@ -38,35 +48,57 @@ const CreatePost = () => {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [blockNavigation]);
 
-  // Merge the newly uploaded files into attachments
+  useEffect(() => {
+    const map = L.map('map').setView([51.505, -0.09], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    let marker;
+
+    const onMapClick = (e) => {
+      const { lat, lng } = e.latlng;
+      setPost((prev) => ({ ...prev, lat, lng, location: `${lat.toFixed(5)}, ${lng.toFixed(5)}` }));
+
+      if (marker) {
+        map.removeLayer(marker);
+      }
+
+      marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
+    };
+
+    map.on('click', onMapClick);
+
+    return () => {
+      map.off('click', onMapClick);
+      map.remove();
+    };
+  }, []);
+
   const handleAddAttachments = (newFiles) => {
     setAttachments((prev) => [...prev, ...newFiles]);
   };
 
-  // Remove a file by index
   const handleRemoveFile = (index) => {
     setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsUploading(true);
     setBlockNavigation(true);
 
     try {
-      // Force a minimum 2 second "upload"
       const uploadPromise = createPost(post, attachments);
       const minTimePromise = new Promise((resolve) => setTimeout(resolve, 2000));
 
       await Promise.all([uploadPromise, minTimePromise]);
 
-      // Reset post data
-      setPost({ location: '', title: 'blank', content: '' });
+      setPost({ location: '', title: 'blank', content: '', lat: '', lng: '' });
       setAttachments([]);
       setShowSuccess(true);
 
-      // Navigate after a short delay
       setTimeout(() => navigate("/"), 2000);
     } catch (error) {
       console.error('Upload failed:', error);
@@ -76,66 +108,59 @@ const CreatePost = () => {
     }
   };
 
-  // Close success snackbar
   const handleCloseSuccess = () => {
     setShowSuccess(false);
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4 }}>
-      {/* Top Header */}
-      <Box display="flex" justifyContent="space-between">
-        <Typography variant="h2" color="primary" gutterBottom>
-          Dodaj nowy wpis dziennika
-        </Typography>
-        <Box sx={{ m: 'auto 10px' }}>
-          <BackButton disabled={isUploading} />
+    <Paper elevation={3} sx={{ pt: 1, borderRadius: 2, backgroundColor: '#f9f9f9' }}>
+      <Container maxWidth="sm" sx={{ mt: 4 }} style={{ marginBottom: '50px' }}>
+        <Box display="flex" justifyContent="space-between">
+          <Typography variant="h2" color="primary" gutterBottom>
+            Dodaj przystanek Podróżnika
+          </Typography>
         </Box>
-      </Box>
 
-      {/* FORM */}
-      <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
-        {/* Post Fields */}
-        <TextField
-          fullWidth
-          label="Miejsce (kraj, miejscowość)"
-          value={post.location}
-          onChange={(e) => setPost({ ...post, location: e.target.value })}
-          margin="normal"
-        />
-        <TextField
-          fullWidth
-          label="Notatka (np. kim jesteś, skąd dostałeś totem, komu go przekażesz)"
-          value={post.content}
-          onChange={(e) => setPost({ ...post, content: e.target.value })}
-          multiline
-          rows={4}
-          margin="normal"
-        />
+        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
+          <TextField
+            fullWidth
+            label="Miejsce (kraj, miejscowość)"
+            value={post.location}
+            onChange={(e) => setPost({ ...post, location: e.target.value })}
+            margin="normal"
+          />
+          <Box id="map" style={{ height: '400px', width: '100%', marginTop: '20px', borderRadius: '8px' }}></Box>
+          <TextField
+            fullWidth
+            label="Coś o sobie, miejscu i czasie"
+            value={post.content}
+            onChange={(e) => setPost({ ...post, content: e.target.value })}
+            multiline
+            rows={4}
+            margin="normal"
+          />
 
-        {/* Attachments Preview */}
-        <AttachmentsGrid attachments={attachments} onRemoveFile={handleRemoveFile} />
+          <AttachmentsGrid attachments={attachments} onRemoveFile={handleRemoveFile} />
 
-        {/* Media Selection (file system, camera) */}
-        <MediaSelectionButtons isUploading={isUploading} onAddFiles={handleAddAttachments} />
+          <MediaSelectionButtons isUploading={isUploading} onAddFiles={handleAddAttachments} />
 
-        {/* Submit Button */}
-        <Button
-          type="submit"
-          variant="contained"
-          color="secondary"
-          fullWidth
-          sx={{ mt: 4 }}
-          disabled={isUploading}
-        >
-          {isUploading ? 'Przesyłanie...' : 'Wyślij'}
-        </Button>
-      </Box>
+          <Button
+            type="submit"
+            variant="contained"
+            color="secondary"
+            fullWidth
+            sx={{ mt: 4 }}
+            disabled={isUploading}
+          >
+            {isUploading ? 'Przesyłanie...' : 'Wyślij'}
+          </Button>
+        </Box>
 
-      {/* Upload Progress & Success Notifications */}
-      <UploadProgressModal open={isUploading} />
-      <SuccessSnackbar open={showSuccess} onClose={handleCloseSuccess} />
-    </Container>
+
+        <UploadProgressModal open={isUploading} />
+        <SuccessSnackbar open={showSuccess} onClose={handleCloseSuccess} />
+      </Container>
+    </Paper>
   );
 };
 
