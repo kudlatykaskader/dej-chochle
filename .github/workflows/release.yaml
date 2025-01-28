@@ -97,7 +97,14 @@ jobs:
           sed -i "s|pd-frontend:.*|pd-frontend:${{ needs.package.outputs.image_tag }}|g" environments/develop/k8s/app.yaml
           sed -i "s|pd-backend:.*|pd-backend:${{ needs.package.outputs.image_tag }}|g" environments/develop/k8s/app.yaml
 
-      - name: Deploy to Kubernetes
+      - name: Remove current dev deployment
+        uses: actions-hub/kubectl@master
+        env:
+          KUBE_CONFIG: ${{ secrets.PL_LP_K3S_CONFIG }}
+        with:
+          args: delete -f environments/develop/k8s/app.yaml
+
+      - name: Deploy dev to kubernetes
         uses: actions-hub/kubectl@master
         env:
           KUBE_CONFIG: ${{ secrets.PL_LP_K3S_CONFIG }}

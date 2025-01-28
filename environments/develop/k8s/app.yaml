@@ -90,6 +90,16 @@ spec:
               value: db_pass
             - name: DB_NAME
               value: db_name
+            - name: STORAGE_SERVICE
+              value: local
+            # - name: MINIO_BUCKET
+            #   value: default
+            # - name: MINIO_ENDPOINT
+            #   value: http://minio:9000
+            # - name: MINIO_ACCESS_KEY_ID
+            #   value: administrator
+            # - name: MINIO_SECRET_ACCESS_KEY
+            #   value: administrator
       containers:
         - name: backend
           imagePullPolicy: Always
@@ -108,15 +118,15 @@ spec:
             - name: DB_NAME
               value: db_name
             - name: STORAGE_SERVICE
-              value: minio
-            - name: MINIO_BUCKET
-              value: default
-            - name: MINIO_ENDPOINT
-              value: http://minio:9000
-            - name: MINIO_ACCESS_KEY_ID
-              value: administrator
-            - name: MINIO_SECRET_ACCESS_KEY
-              value: administrator
+              value: local
+            # - name: MINIO_BUCKET
+            #   value: default
+            # - name: MINIO_ENDPOINT
+            #   value: http://minio:9000
+            # - name: MINIO_ACCESS_KEY_ID
+            #   value: administrator
+            # - name: MINIO_SECRET_ACCESS_KEY
+            #   value: administrator
           ports:
             - containerPort: 3000
 
