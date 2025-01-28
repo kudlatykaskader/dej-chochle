@@ -44,9 +44,15 @@ services:
       - migrate
 
   migrate:
-    build: backend/
-    image: ghcr.io/warehog/dej-chochle/pd-backend:develop
-    command: ["rails", "db:migrate",]
+    image: ruby:3.2.2
+    entrypoint: >
+      /bin/sh -c "
+        cd /app;
+        bundle install;
+        rails db:migrate;
+      "
+    volumes:
+      - ./backend:/app
     environment:
       RAILS_ENV: development
       DB_ADAPTER: postgresql
@@ -69,6 +75,8 @@ services:
       POSTGRES_DB: db_name
       POSTGRES_USER: db_user
       POSTGRES_PASSWORD: db_pass
+    ports:
+      - 5432:5432
     volumes:
       - db_data:/var/lib/postgresql/data
   

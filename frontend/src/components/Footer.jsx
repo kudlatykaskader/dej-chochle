@@ -78,17 +78,32 @@ const Footer = () => {
         <Box mt={4} textAlign="center">
           <Typography variant="body2">
             Created with ❤️ by{' '}
-            <Typography
-              component="span"
+            <Link
+              href="https://github.com/warehog"
+              target="_blank"
+              rel="noopener noreferrer"
+              color="inherit"
+              underline="hover"
               sx={{ fontWeight: 'bold', color: 'secondary.main' }}
             >
-              Mateusz Wójcik & Michał Wierzbicki
-            </Typography>
+              Mateusz Wójcik
+            </Link>{' '}
+            &{' '}
+            <Link
+              href="https://github.com/Fuzyn"
+              target="_blank"
+              rel="noopener noreferrer"
+              color="inherit"
+              underline="hover"
+              sx={{ fontWeight: 'bold', color: 'secondary.main' }}
+            >
+              Michał Wierzbicki
+            </Link>
           </Typography>
         </Box>
       </Container>
     </Box>
-    );
+  );
 };
 
 export default Footer;

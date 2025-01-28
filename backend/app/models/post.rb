@@ -2,8 +2,10 @@ class Post < ApplicationRecord
   has_many_attached :attachments
 
   validates :location, presence: true
-  validates :title, presence: true
   validates :content, presence: true
+  validates :lat, presence: true
+  validates :lng, presence: true
+  validates :contact, presence: true
   # TODO: disable it for the time being - enable when in production
   # validate :one_post_per_minute
   validate :validate_attachments

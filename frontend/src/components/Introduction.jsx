@@ -1,83 +1,82 @@
 import React from 'react';
-import { Typography, Box, Paper, Divider, Button } from '@mui/material';
-
-import Stepper from '@mui/material/Stepper';
-import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
-import StepContent from '@mui/material/StepContent';
-
+import { Typography, Box, Divider, Button, Card, CardContent } from '@mui/material';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import NotesIcon from '@mui/icons-material/Notes';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import InfoIcon from '@mui/icons-material/Info';
+import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 
 const steps = [
-    // { icon: '2', text: 'Przeczytaj historię Podróżnika.' },
-    { icon: AddAPhotoIcon, label: 'Zrób i dodaj zdjęcia', description: 'Z Tobą i Podróżnikiem w zwykłym lub kompletnie niezwykłym miejscu.' },
+    { icon: AddAPhotoIcon, label: 'Zrób zdjęcia', description: 'Z Tobą, Podróżnikiem w zwykłym lub kompletnie niezwykłym miejscu.' },
     { icon: NotesIcon, label: 'Napisz historię', description: 'O miejscu, w którym jesteś, o Podróżniku, o sobie.' },
-    { icon: AddCircleIcon, label: 'Podaj dalej', description: 'Podaruj Podróżnika kolejnej osobie, aby kontynuował swoją podróż.' },
+    { icon: AddCircleIcon, label: 'Dodaj przystanek', description: 'Podziel się swoją historią z innymi, dodając przystanek na mapie.' },
+    { icon: PersonAddAlt1Icon, label: 'Podaj dalej', description: 'Podaruj Podróżnika kolejnej osobie, aby kontynuował swoją podróż.' },
 ];
 
 const Introduction = ({ onScrollToMultiPost, onScrollToCreatePost }) => {
     return (
-        <Paper elevation={3} sx={{ p: 4, borderRadius: 2, backgroundColor: '#f9f9f9' }}>
-            <Box>
-                <Typography variant="h1" color="primary" gutterBottom >
-                    Hej!
-                </Typography>
-
-                <Divider sx={{ my: 2 }} />
-
-                <Typography variant="h4" gutterBottom>
-                    Dobrze trafiłeś!
-                </Typography>
-
-                <Typography variant="body1" gutterBottom>
-                    Jeżeli ktoś podarował Ci Podróżnika, oznacza to że stałeś nowym Posiadaczem.
-                </Typography>
-                <Typography variant="body1" gutterBottom>
-                    Przed Tobą niezwykła przygoda, której staniesz się częścią.
-                </Typography>
-                
-                <Divider sx={{ my: 2 }} />
-
-                <Typography variant="body2" gutterBottom>
-                    Wystarczy, że wykonasz te proste kroki:
-                </Typography>
-
-                <Stepper activeStep={steps[0]} orientation="vertical">
-                    {steps.map((step, index) => (
-                    <Step key={step.label}>
-                        <StepLabel>
-                            <Typography variant="h6">
-                                {step.label}
-                            </Typography>
-                            <Typography variant="body2">
-                                {step.description}
-                            </Typography>
-                        </StepLabel>
-                        <StepContent>
-                        </StepContent>
-                    </Step>
-                    ))}
-                </Stepper>
-                
-                <Divider sx={{ my: 2 }} />
-
-                {/* Buttons */}
-                <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-                    <Button variant="contained" color="primary" onClick={onScrollToMultiPost}>
-                        Przejdź do galerii
-                    </Button>
-                    <Button variant="contained" color="secondary" onClick={onScrollToCreatePost}>
-                        Dodaj przystanek
-                    </Button>
-                </Box>
-
-                {/* <Typography variant="h6" gutterBottom>
-                    Pamiętaj, że Podróżnik jest tylko gościem w Twoim życiu. Nie zatrzymuj go na dłużej niż na kilka dni. Po tym czasie przekaż go dalej, aby kontynuował swoją podróż. Dziękujemy za udział w naszym projekcie i życzymy miłej zabawy!
-                </Typography> */}
+        <Box sx={{ mt: 4, textAlign: 'center' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', pb: 2 }}>
+                <InfoIcon color="primary" style={{ fontSize: 60 }} />
             </Box>
-        </Paper>
+
+            <Typography variant="h1" color="primary" gutterBottom>
+                Hej!
+            </Typography>
+
+            <Divider sx={{ my: 2 }} />
+
+            <Typography variant="h4" gutterBottom>
+                Dobrze trafiłeś!
+            </Typography>
+
+            <Typography variant="body1" gutterBottom>
+                Jeżeli ktoś podarował Ci Podróżnika, oznacza to że stałeś nowym Posiadaczem.
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+                Przed Tobą niezwykła przygoda, której staniesz się częścią.
+            </Typography>
+
+            <Divider sx={{ my: 2 }} />
+
+            <Typography variant="body2" gutterBottom>
+                Wystarczy, że wykonasz te proste kroki:
+            </Typography>
+
+            {/* Timeline */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 3 }}>
+                {steps.map((step, index) => {
+                    const Icon = step.icon;
+                    return (
+                        <Card key={index} sx={{ display: 'flex', alignItems: 'center', pt: 0, pb: 0, pl: 2, pr: 2, boxShadow: 3 }}>
+                            <Box sx={{ mr: 2 }}>
+                                <Icon color="primary" style={{ fontSize: 40 }} />
+                            </Box>
+                            <CardContent>
+                                <Typography variant="h6" gutterBottom>
+                                    {step.label}
+                                </Typography>
+                                <Typography variant="body2">
+                                    {step.description}
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    );
+                })}
+            </Box>
+
+            {/* Buttons */}
+            <Box sx={{ display: 'flex', gap: 2, mt: 4 }}>
+                <Button variant="contained" color="primary" onClick={onScrollToMultiPost}>
+                    Przejdź do galerii
+                </Button>
+                <Button variant="contained" color="secondary" onClick={onScrollToCreatePost}>
+                    Dodaj przystanek
+                </Button>
+            </Box>
+
+            <Divider sx={{ my: 2 }} />
+        </Box>
     );
 };
 

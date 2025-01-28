@@ -78,7 +78,9 @@ const TimelineItem = ({ time, place, header, paragraph, attachments }) => {
           <Typography variant="h6" className="time-place">
             {place}
             <span className="separator-dot">•</span>
-            {timeAgo(time)}
+          </Typography>
+          <Typography variant="body2" className="time-ago">
+            {timeAgo(time)} temu
           </Typography>
 
 
