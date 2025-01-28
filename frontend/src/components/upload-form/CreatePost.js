@@ -112,7 +112,7 @@ const CreatePost = () => {
   };
 
   return (
-    <Paper elevation={3} sx={{ pt: 1, borderRadius: 2, backgroundColor: '#f9f9f9' }}>
+    <Paper elevation={3} sx={{ pt: 1, pb: 1, borderRadius: 2, backgroundColor: '#f9f9f9' }}>
       <Container maxWidth="sm" sx={{ mt: 4 }} style={{ marginBottom: '50px' }}>
         <Box display="flex" justifyContent="space-between">
           <Typography variant="h2" color="primary" gutterBottom>

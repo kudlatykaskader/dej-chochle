@@ -5,6 +5,7 @@ import theme from './theme';
 import Home from './components/Home';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import axios from "axios";
+import Footer from './components/Footer';
 
 function App() {
     if (process.env.NODE_ENV === 'development') {
@@ -21,6 +22,7 @@ function App() {
                     <Route path="/" element={<Home />} />
                 </Routes>
             </Router>
+            <Footer />
         </ThemeProvider>
     );
 }
