@@ -4,7 +4,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme';
 import MultiPost from './components/MultiPost';
 import SinglePost from './components/SinglePost';
-import CreatePost from './components/CreatePost';
+import CreatePost from './components/upload-form/CreatePost';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import axios from "axios";
 
