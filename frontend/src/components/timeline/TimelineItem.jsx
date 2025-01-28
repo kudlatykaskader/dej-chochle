@@ -38,7 +38,7 @@ const getValueAppendix = (value) => {
     return 'a';
   } else if (value >= 2 && value <= 4) {
     return 'y';
-  } else if (value % 10 >= 2 && value % 10 <= 4) {
+  } else if (value > 20 && value % 10 >= 2 && value % 10 <= 4) {
     return 'y';
   } else {
     return '';
