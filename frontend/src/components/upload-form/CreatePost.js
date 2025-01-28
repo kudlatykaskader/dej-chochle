@@ -7,7 +7,6 @@ import {
   Box,
   Paper,
 } from '@mui/material';
-import BackButton from "../buttons/BackButton";
 import { useNavigate } from "react-router-dom";
 import { createPost } from "../PostApi";
 import L from 'leaflet';
@@ -18,7 +17,7 @@ import AttachmentsGrid from "./AttachmentsGrid";
 import MediaSelectionButtons from "./MediaSelectionButtons";
 import UploadProgressModal from "./UploadProgressModal";
 import SuccessSnackbar from "./SuccessSnackbar";
-import placeholder from './placeholder.png';
+import placeholder from '../../placeholder.png';
 
 
 const customIcon = L.icon({
@@ -49,7 +48,7 @@ const CreatePost = () => {
   }, [blockNavigation]);
 
   useEffect(() => {
-    const map = L.map('map').setView([51.505, -0.09], 13);
+    const map = L.map('map').setView([51.505, 19.000], 5);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -124,7 +123,7 @@ const CreatePost = () => {
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
           <TextField
             fullWidth
-            label="Miejsce (kraj, miejscowość)"
+            label="Miejsce (kraj, miejscowość lub współrzędne)"
             value={post.location}
             onChange={(e) => setPost({ ...post, location: e.target.value })}
             margin="normal"

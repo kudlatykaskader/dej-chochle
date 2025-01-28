@@ -27,7 +27,7 @@ const Home = () => {
             <div ref={createPostRef}>
                 <CreatePost />
             </div>
-            <Map locations={[{ lat: 51.505, lng: -0.09, description: 'London' }, { lat: 48.8566, lng: 2.3522, description: 'Paris' }]} />
+            <Map locations={[{ lat: 50.049683, lng: 19.944544, description: 'London' }, { lat: 48.8566, lng: 2.3522, description: 'Paris' }]} />
         </Container>
     );
 };

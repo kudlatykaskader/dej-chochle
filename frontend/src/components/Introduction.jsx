@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Paper, Divider, Card, CardContent, Button } from '@mui/material';
-import { styled } from '@mui/system';
-import CreateButton from "./buttons/CreateButton";
+import React from 'react';
+import { Typography, Box, Paper, Divider, Button } from '@mui/material';
 
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
 
-import QrCode2Icon from '@mui/icons-material/QrCode2';
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import NotesIcon from '@mui/icons-material/Notes';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
