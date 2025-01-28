@@ -8,16 +8,16 @@ services:
       PORT: 80
     entrypoint: >
       /bin/sh -c "
-      cd /app;
-      npm ci;
-      npm start;
+        cd /app;
+        npm ci;
+        npm start;
       "
     volumes:
       - ./frontend:/app
 
   backend:
-    build: backend/
-    image: ghcr.io/warehog/dej-chochle/pd-backend:develop
+    # build: backend/
+    image: ruby:3.2.2
     ports:
       - 3001:3000
     environment:
@@ -27,11 +27,19 @@ services:
       DB_NAME: db_name
       DB_USER: db_user
       DB_PASS: db_pass
-      STORAGE_SERVICE: minio
+      STORAGE_SERVICE: local
       MINIO_BUCKET: default
       MINIO_ENDPOINT: http://minio:9000
       MINIO_ACCESS_KEY_ID: administrator
       MINIO_SECRET_ACCESS_KEY: administrator
+    volumes:
+      - ./backend:/app
+    entrypoint: >
+      /bin/sh -c "
+        cd /app;
+        bundle install;
+        bundle exec rails s -b 0.0.0.0;
+      "
     depends_on:
       - migrate
 
@@ -46,7 +54,7 @@ services:
       DB_NAME: db_name
       DB_USER: db_user
       DB_PASS: db_pass
-      STORAGE_SERVICE: minio
+      STORAGE_SERVICE: local
       MINIO_BUCKET: default
       MINIO_ENDPOINT: http://minio:9000
       MINIO_ACCESS_KEY_ID: administrator
