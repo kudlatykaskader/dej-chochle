@@ -33,7 +33,7 @@ const MediaSelectionButtons = ({ isUploading, onAddFiles }) => {
           startIcon={<AttachFileIcon />}
           disabled={isUploading}
         >
-          Dodaj z galerii
+          Galeria
           <input
             type="file"
             multiple
@@ -52,7 +52,7 @@ const MediaSelectionButtons = ({ isUploading, onAddFiles }) => {
           startIcon={<CameraAltIcon />}
           disabled={isUploading}
         >
-          Zrób zdjęcie
+          Aparat
           <input
             type="file"
             hidden
