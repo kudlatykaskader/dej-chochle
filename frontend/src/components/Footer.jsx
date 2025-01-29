@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Typography, Link, Box, Grid2 as Grid } from '@mui/material';
-import { Email, WhatsApp, Telegram } from '@mui/icons-material';
+import { Email, WhatsApp, Telegram, GitHub } from '@mui/icons-material';
 
 const Footer = () => {
   return (
@@ -20,7 +20,7 @@ const Footer = () => {
             <Box display="flex" justifyContent="center" gap={3} flexWrap="wrap">
               {/* Email */}
               <Link
-                href="mailto:podejdalej@int.pl"
+                href="mailto:info@podej-dalej.pl"
                 color="inherit"
                 underline="hover"
                 sx={{
@@ -31,7 +31,7 @@ const Footer = () => {
                 }}
               >
                 <Email fontSize="small" />
-                podejdalej@int.pl
+                info@podej-dalej.pl
               </Link>
 
               {/* WhatsApp */}
@@ -68,6 +68,23 @@ const Footer = () => {
               >
                 <Telegram fontSize="small" />
                 Telegram
+              </Link>
+              {/* GitHub */}
+              <Link
+                href="https://github.com/warehog/podej-dalej"
+                target="_blank"
+                rel="noopener noreferrer"
+                color="inherit"
+                underline="hover"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  '&:hover': { color: 'secondary.main' },
+                }}
+              >
+                <GitHub fontSize="small" />
+                GitHub
               </Link>
 
             </Box>
