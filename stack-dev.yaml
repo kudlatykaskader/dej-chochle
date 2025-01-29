@@ -2,12 +2,22 @@ version: '3.8'
 
 services:
   frontend:
-    build: frontend/
-    image: ghcr.io/warehog/podej-dalej/pd-frontend:develop
+    image: node:22
+    environment:
+      NODE_ENV: development
+      PORT: 80
+    entrypoint: >
+      /bin/sh -c "
+        cd /app;
+        npm ci;
+        npm start;
+      "
+    volumes:
+      - ./frontend:/app
 
   backend:
-    build: backend/
-    image: ghcr.io/warehog/podej-dalej/pd-backend:develop
+    # build: backend/
+    image: ruby:3.2.2
     ports:
       - 3001:3000
     environment:
@@ -22,16 +32,27 @@ services:
       MINIO_ENDPOINT: http://minio:9000
       MINIO_ACCESS_KEY_ID: administrator
       MINIO_SECRET_ACCESS_KEY: administrator
+    volumes:
+      - ./backend:/app
+    entrypoint: >
+      /bin/sh -c "
+        cd /app;
+        bundle install;
+        bundle exec rails s -b 0.0.0.0;
+      "
     depends_on:
       - migrate
 
   migrate:
-    build: backend/
-    image: ghcr.io/warehog/podej-dalej/pd-backend:develop
+    image: ruby:3.2.2
     entrypoint: >
       /bin/sh -c "
+        cd /app;
+        bundle install;
         rails db:migrate;
       "
+    volumes:
+      - ./backend:/app
     environment:
       RAILS_ENV: development
       DB_ADAPTER: postgresql
