@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    image: ghcr.io/warehog/dej-chochle/podej-dalej:latest
+    image: ghcr.io/warehog/podej-dalej/podej-dalej:latest
     ports:
       - 3000:3000
     environment:

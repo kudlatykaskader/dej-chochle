@@ -3,11 +3,11 @@ version: '3.8'
 services:
   frontend:
     build: frontend/
-    image: ghcr.io/warehog/dej-chochle/pd-frontend:develop
+    image: ghcr.io/warehog/podej-dalej/pd-frontend:develop
 
   backend:
     build: backend/
-    image: ghcr.io/warehog/dej-chochle/pd-backend:develop
+    image: ghcr.io/warehog/podej-dalej/pd-backend:develop
     ports:
       - 3000:3000
     environment:
@@ -22,7 +22,7 @@ services:
 
   migrate:
     build: backend/
-    image: ghcr.io/warehog/dej-chochle/pd-backend:develop
+    image: ghcr.io/warehog/podej-dalej/pd-backend:develop
     command: ["rails", "db:migrate",]
     environment:
       RAILS_ENV: production
