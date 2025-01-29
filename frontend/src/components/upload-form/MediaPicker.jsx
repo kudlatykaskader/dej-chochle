@@ -4,7 +4,7 @@ import { Grid, Button } from '@mui/material';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 
-const MediaPicker = ({ isUploading, onAddFiles }) => {
+const MediaPicker = ({ onAddFiles }) => {
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
 
@@ -31,7 +31,6 @@ const MediaPicker = ({ isUploading, onAddFiles }) => {
           variant="contained"
           component="label"
           startIcon={<AttachFileIcon />}
-          disabled={isUploading}
         >
           Galeria
           <input
@@ -50,7 +49,6 @@ const MediaPicker = ({ isUploading, onAddFiles }) => {
           variant="outlined"
           component="label"
           startIcon={<CameraAltIcon />}
-          disabled={isUploading}
         >
           Aparat
           <input

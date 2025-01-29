@@ -1,6 +1,6 @@
 // src/components/CreatePostStepper.js
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Stepper,
@@ -26,7 +26,6 @@ import {
   OuterSectionContainer,
   OuterSectionIcon,
 } from '../styled-components';
-import ImageGallery from '../image-gallery/ImageGallery';
 
 const steps = [
   'Dodaj zdjęcia',
@@ -121,15 +120,14 @@ const UploadForm = () => {
     }
   };
 
-  // Callback function to handle location selection from MapPicker
-  const handleLocationSelect = ({ lat, lng, location }) => {
+  const handleLocationSelect = useCallback(({ lat, lng, location }) => {
     setPost((prev) => ({
       ...prev,
       lat,
       lng,
       location,
     }));
-  };
+  }, []);
 
   const getStepContent = (step) => {
     switch (step) {
@@ -137,13 +135,13 @@ const UploadForm = () => {
         return (
           <Box sx={{ mt: 2 }}>
             <Typography variant="h6" gutterBottom>
-              Krok 1: Wybierz lub Zrób Zdjęcia
+              Krok 1: Dodaj Zdjęcia Przystanku
             </Typography>
-
+            <Typography variant="caption" color="textSecondary">
+              Nie więcej niż 5 zdjęć, które najlepiej opisują to miejsce, Ciebie i Podróżnika.
+            </Typography>
             <AttachmentsGrid attachments={attachments} onRemoveFile={handleRemoveFile} />
-
             <MediaPicker
-              isUploading={isUploading}
               onAddFiles={handleAddAttachments}
             />
           </Box>
@@ -155,15 +153,19 @@ const UploadForm = () => {
             <Typography variant="h6" gutterBottom>
               Krok 2: Wybierz Lokalizację na Mapie
             </Typography>
+            <Typography variant="caption" color="textSecondary">
+              Użyj mapy, aby w przybliżeniu wskazać miejsce, w którym zrobiłeś zdjęcia.
+            </Typography>
             <TextField
               fullWidth
               label="Wybrana Lokalizacja"
               value={post.location}
               disabled
               margin="normal"
-              helperText="Kliknij na mapie poniżej, aby wybrać miejsce gdzie zrobiono zdjęcie."
             />
-            <MapPicker onLocationSelect={handleLocationSelect} />
+            <MapPicker
+              onLocationSelect={handleLocationSelect}
+              initialPosition={[post.lan || 51.505, post.lng || 19.000]} />
           </Box>
         );
 
@@ -206,10 +208,10 @@ const UploadForm = () => {
           <AddPhotoAlternateIcon/>
         </OuterSectionIcon>
         <Typography variant="h2" color="primary" gutterBottom>
-          Dodaj Przystanek Podróżnika
+          Dodaj Przystanek
         </Typography>
         <Typography variant="h6" color="primary">
-          Czyli miejsce, w którym jesteś, lub do którego zabrałeś Podróżnika
+          W domu, w lesie czy na szczycie góry? Pokaż miejsce do którego zabrałeś Podróżnika
         </Typography>
 
       <Stepper sx={{mt: 2}} activeStep={activeStep} alternativeLabel>

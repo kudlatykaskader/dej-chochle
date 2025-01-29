@@ -16,7 +16,7 @@ const customIcon = L.icon({
   popupAnchor: [0, -32],
 });
 
-const MapPicker = ({ onLocationSelect, initialPosition = [51.505, 19.000], zoom = 5 }) => {
+const MapPicker = ({ onLocationSelect, initialPosition, zoom = 5 }) => {
   const mapRef = useRef(null);
   const markerRef = useRef(null);
 
@@ -67,19 +67,11 @@ const MapPicker = ({ onLocationSelect, initialPosition = [51.505, 19.000], zoom 
       mapRef.current.on('click', onMapClick);
     }
 
-    // Cleanup when component unmounts
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.off();
-        mapRef.current.remove();
-        mapRef.current = null;
-        markerRef.current = null;
-      }
-    };
+    return () => {};
   }, [initialPosition, zoom, onLocationSelect]);
 
   return (
-      <Box id="map-picker" sx={{ width: '100%', height: 350, borderRadius: 2, mt: 2 }}/>
+    <Box id="map-picker" sx={{ width: '100%', height: 350, borderRadius: 2, mt: 2 }} />
   );
 };
 
