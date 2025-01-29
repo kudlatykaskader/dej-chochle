@@ -93,11 +93,8 @@ const UploadForm = () => {
     setBlockNavigation(true);
 
     try {
-      const uploadPromise = createPost(post, attachments);
-      // For demonstration, ensure a minimum time to see progress
-      const minTimePromise = new Promise((resolve) => setTimeout(resolve, 2000));
-      await Promise.all([uploadPromise, minTimePromise]);
-
+      await createPost(post, attachments);
+      window.location.reload();
       setPost({
         location: '',
         content: '',

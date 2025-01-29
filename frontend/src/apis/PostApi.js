@@ -8,7 +8,7 @@ export const getPosts = (callback) => {
     axios.get(`/posts`).then(callback);
 }
 
-export const createPost = (post, attachments, callback) => {
+export const createPost = async (post, attachments, callback) => {
     const formData = new FormData();
     formData.append('post[location]', post.location);
     formData.append('post[content]', post.content);
@@ -17,11 +17,16 @@ export const createPost = (post, attachments, callback) => {
     formData.append('post[contact]', post.contact);
     attachments.forEach((file) => formData.append('post[attachments][]', file));
 
-    axios.post(`/posts`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    }).then(callback);
+    try {
+        const response = await axios.post(`/posts`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        callback(response);
+    } catch (error) {
+        console.error('Error creating post:', error);
+    }
 }
 
 export const deletePost = (id, callback) => {
