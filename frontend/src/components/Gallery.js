@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Divider, Box } from '@mui/material';
-import { getPosts } from "./PostApi";
+import { Typography } from '@mui/material';
+import { getPosts } from "./../apis/PostApi";
 
 import Timeline from './timeline/Timeline';
 import TimelineItem from './timeline/TimelineItem';
 
 import MapIcon from '@mui/icons-material/Map';
 
-const MultiPost = () => {
+import { OuterSectionContainer, OuterSectionIcon } from './styled-components';
+
+const Gallery = () => {
     const [posts, setPosts] = useState([]);
 
     useEffect(() => {
@@ -15,11 +17,10 @@ const MultiPost = () => {
     }, []);
 
     return (
-        <Container maxWidth="md" sx={{ mt: 4, p: 1 }} style={{ marginBottom: '50px', textAlign: 'center' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'center', pb: 2 }}>
-              <MapIcon color="primary" style={{ fontSize: 60 }} />
-            </Box>
-            
+        <OuterSectionContainer>
+            <OuterSectionIcon>
+                <MapIcon/>
+            </OuterSectionIcon>
             <Typography variant="h6" gutterBottom>
                 Najnowsze przystanki
             </Typography>
@@ -34,9 +35,8 @@ const MultiPost = () => {
                     />
                 ))}
             </Timeline>
-            <Divider sx={{ my: 2 }} />
-        </Container>
+        </OuterSectionContainer>
     );
 };
 
-export default MultiPost;
+export default Gallery;

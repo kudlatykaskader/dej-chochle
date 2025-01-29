@@ -1,10 +1,10 @@
-// MediaSelectionButtons.jsx
+// MediaPicker.jsx
 import React, { useRef } from 'react';
 import { Grid, Button } from '@mui/material';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 
-const MediaSelectionButtons = ({ isUploading, onAddFiles }) => {
+const MediaPicker = ({ isUploading, onAddFiles }) => {
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
 
@@ -67,4 +67,4 @@ const MediaSelectionButtons = ({ isUploading, onAddFiles }) => {
   );
 };
 
-export default MediaSelectionButtons;
+export default MediaPicker;

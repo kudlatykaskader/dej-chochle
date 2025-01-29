@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+// src/components/CreatePostStepper.js
+
+import React, { useState, useEffect } from 'react';
 import {
-  Container,
   Box,
   Stepper,
   Step,
@@ -9,38 +10,31 @@ import {
   Typography,
   TextField,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 
 import AttachmentsGrid from './AttachmentsGrid';
-import MediaSelectionButtons from './MediaSelectionButtons';
+import MediaPicker from './MediaPicker';
 import UploadProgressModal from './UploadProgressModal';
 import SuccessSnackbar from './SuccessSnackbar';
+import MapPicker from './MapPicker'; // Import the new MapPicker component
 
-import { createPost } from '../PostApi';
-import { getLocationInfo } from '../../apis/osm';
-import placeholder from '../../placeholder.png';
+import { createPost } from '../../apis/PostApi';
+
+import {
+  HorizontalButtonGroup,
+  OuterSectionContainer,
+  OuterSectionIcon,
+} from '../styled-components';
+import ImageGallery from '../image-gallery/ImageGallery';
 
 const steps = [
-  'Dodaje zdjęcia',
+  'Dodaj zdjęcia',
   'Wybierz Lokalizację',
   'Dodaj Opis'
 ];
 
-const customIcon = L.icon({
-  iconUrl: placeholder,
-  iconSize: [32, 32],
-  iconAnchor: [16, 32],
-  popupAnchor: [0, -32],
-});
-
-const CreatePostStepper = () => {
-  const navigate = useNavigate();
-
+const UploadForm = () => {
   const [post, setPost] = useState({
     location: '',
     title: 'blank',
@@ -50,24 +44,20 @@ const CreatePostStepper = () => {
     contact: '',
   });
 
-  // Stan załączników (zdjęcia)
+  // State for attachments (photos)
   const [attachments, setAttachments] = useState([]);
 
-  // Kontrola kroków
+  // Control steps
   const [activeStep, setActiveStep] = useState(0);
 
-  // Stany przesyłania / sukcesu
+  // Uploading / success states
   const [isUploading, setIsUploading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // Blokowanie nawigacji (np. podczas odświeżania strony)
+  // Navigation blocking state (e.g., during upload)
   const [blockNavigation, setBlockNavigation] = useState(false);
 
-  // Referencje do mapy, aby jej nie inicjalizować ponownie
-  const mapRef = useRef(null);
-  const markerRef = useRef(null);
-
-  // Obsługa prób zamknięcia lub przeładowania zakładki podczas przesyłania
+  // Handle before unload to block navigation if necessary
   useEffect(() => {
     const handleBeforeUnload = (e) => {
       if (blockNavigation) {
@@ -79,61 +69,8 @@ const CreatePostStepper = () => {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [blockNavigation]);
 
-  useEffect(() => {
-    if (activeStep === 1 && !mapRef.current) {
-      mapRef.current = L.map('map').setView([51.505, 19.000], 5);
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      }).addTo(mapRef.current);
-
-      const onMapClick = async (e) => {
-        const { lat, lng } = e.latlng;
-
-        if (markerRef.current) {
-          mapRef.current.removeLayer(markerRef.current);
-        }
-
-        markerRef.current = L.marker([lat, lng], { icon: customIcon }).addTo(mapRef.current);
-
-        try {
-          const { country, city } = await getLocationInfo(lat, lng);
-          const locationString = `${country}, ${city}`;
-
-          setPost((prev) => ({
-            ...prev,
-            lat,
-            lng,
-            location: locationString,
-          }));
-        } catch (error) {
-          console.error('Błąd podczas pobierania danych lokalizacji:', error);
-
-          // Alternatywa w przypadku błędu API
-          setPost((prev) => ({
-            ...prev,
-            lat,
-            lng,
-            location: `${lat.toFixed(5)}, ${lng.toFixed(5)}`,
-          }));
-        }
-      };
-
-      mapRef.current.on('click', onMapClick);
-    }
-
-    return () => {
-      if (activeStep !== 1 && mapRef.current) {
-        mapRef.current.off();
-        mapRef.current.remove();
-        mapRef.current = null;
-        markerRef.current = null;
-      }
-    };
-  }, [activeStep]);
-
   const handleAddAttachments = (newFiles) => {
+    console.info('Adding files:', newFiles);
     setAttachments((prev) => [...prev, ...newFiles]);
   };
   const handleRemoveFile = (index) => {
@@ -158,7 +95,7 @@ const CreatePostStepper = () => {
 
     try {
       const uploadPromise = createPost(post, attachments);
-      // Dla demonstracji, zapewnij minimalny czas, aby można było zobaczyć postęp
+      // For demonstration, ensure a minimum time to see progress
       const minTimePromise = new Promise((resolve) => setTimeout(resolve, 2000));
       await Promise.all([uploadPromise, minTimePromise]);
 
@@ -173,20 +110,30 @@ const CreatePostStepper = () => {
       setAttachments([]);
       setShowSuccess(true);
 
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
+      // setTimeout(() => {
+      //   navigate('/');
+      // }, 2000);
     } catch (error) {
-      console.error('Przesyłanie nie powiodło się:', error);
+      console.error('Upload failed:', error);
     } finally {
       setIsUploading(false);
       setBlockNavigation(false);
     }
   };
 
+  // Callback function to handle location selection from MapPicker
+  const handleLocationSelect = ({ lat, lng, location }) => {
+    setPost((prev) => ({
+      ...prev,
+      lat,
+      lng,
+      location,
+    }));
+  };
+
   const getStepContent = (step) => {
     switch (step) {
-      case 0: // Krok 1: Załączniki
+      case 0: // Step 1: Attachments
         return (
           <Box sx={{ mt: 2 }}>
             <Typography variant="h6" gutterBottom>
@@ -195,14 +142,14 @@ const CreatePostStepper = () => {
 
             <AttachmentsGrid attachments={attachments} onRemoveFile={handleRemoveFile} />
 
-            <MediaSelectionButtons
+            <MediaPicker
               isUploading={isUploading}
               onAddFiles={handleAddAttachments}
             />
           </Box>
         );
 
-      case 1: // Krok 2: Lokalizacja
+      case 1: // Step 2: Location
         return (
           <Box sx={{ mt: 2 }}>
             <Typography variant="h6" gutterBottom>
@@ -216,14 +163,11 @@ const CreatePostStepper = () => {
               margin="normal"
               helperText="Kliknij na mapie poniżej, aby wybrać miejsce gdzie zrobiono zdjęcie."
             />
-            <Box
-              id="map"
-              sx={{ width: '100%', height: 350, borderRadius: 2, mt: 2 }}
-            />
+            <MapPicker onLocationSelect={handleLocationSelect} />
           </Box>
         );
 
-      case 2: // Krok 3: Notatka
+      case 2: // Step 3: Description
         return (
           <Box sx={{ mt: 2 }}>
             <Typography variant="h6" gutterBottom>
@@ -257,18 +201,18 @@ const CreatePostStepper = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-      <Box textAlign="center" sx={{ mb: 4 }}>
-        <AddPhotoAlternateIcon color="primary" sx={{ fontSize: 60 }} />
+    <OuterSectionContainer>
+        <OuterSectionIcon>
+          <AddPhotoAlternateIcon/>
+        </OuterSectionIcon>
         <Typography variant="h2" color="primary" gutterBottom>
           Dodaj Przystanek Podróżnika
         </Typography>
         <Typography variant="h6" color="primary">
           Czyli miejsce, w którym jesteś, lub do którego zabrałeś Podróżnika
         </Typography>
-      </Box>
 
-      <Stepper activeStep={activeStep} alternativeLabel>
+      <Stepper sx={{mt: 2}} activeStep={activeStep} alternativeLabel>
         {steps.map((label) => (
           <Step key={label}>
             <StepLabel>{label}</StepLabel>
@@ -276,19 +220,17 @@ const CreatePostStepper = () => {
         ))}
       </Stepper>
 
-      <Box sx={{ mt: 4 }}>{getStepContent(activeStep)}</Box>
+      <Box sx={{ mt: 4 }}>
+        {getStepContent(activeStep)}
+      </Box>
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-        <Button
-          disabled={activeStep === 0 || isUploading}
-          onClick={handleBack}
-          variant="outlined"
-        >
+      <HorizontalButtonGroup>
+        <Button disabled={activeStep === 0} onClick={handleBack}mvariant="outlined">
           Cofnij
         </Button>
         {activeStep < steps.length - 1 ? (
           <Button onClick={handleNext} variant="contained" color="primary">
-            Następny
+            Następny krok
           </Button>
         ) : (
           <Button
@@ -300,12 +242,12 @@ const CreatePostStepper = () => {
             {isUploading ? 'Przesyłanie...' : 'Prześlij'}
           </Button>
         )}
-      </Box>
+      </HorizontalButtonGroup>
 
       <UploadProgressModal open={isUploading} />
       <SuccessSnackbar open={showSuccess} onClose={handleCloseSuccess} />
-    </Container>
+    </OuterSectionContainer>
   );
 };
 
-export default CreatePostStepper;
+export default UploadForm;
