@@ -23,3 +23,7 @@ export const createPost = (post, attachments, callback) => {
         },
     }).then(callback);
 }
+
+export const deletePost = (id, callback) => {
+    axios.delete(`/posts/${id}`).then(callback);
+}

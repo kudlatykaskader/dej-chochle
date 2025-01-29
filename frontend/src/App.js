@@ -6,6 +6,7 @@ import Home from './components/Home';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import axios from "axios";
 import Footer from './components/Footer';
+import AdminPage from './components/admin/AdminPage';
 
 function App() {
     if (process.env.NODE_ENV === 'development') {
@@ -20,6 +21,7 @@ function App() {
             <Router>
                 <Routes>
                     <Route path="/" element={<Home />} />
+                    <Route path="/admin" element={<AdminPage />} />
                 </Routes>
             </Router>
             <Footer />
