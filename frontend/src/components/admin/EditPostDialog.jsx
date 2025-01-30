@@ -34,7 +34,7 @@ const EditPostDialog = ({ open, post, onClose, onSave }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle>Edit Post</DialogTitle>
+      <DialogTitle>Edytuj Opis</DialogTitle>
       <DialogContent>
         {/* Post Content */}
         <TextField
@@ -50,7 +50,7 @@ const EditPostDialog = ({ open, post, onClose, onSave }) => {
         {/* Attachments Section */}
         {attachments.length > 0 && (
           <Box sx={{ mt: 3 }}>
-            <Typography variant="subtitle1">Attachments</Typography>
+            <Typography variant="subtitle1">Załączniki</Typography>
             {attachments.map((attachment) => (
               <Box
                 key={attachment.id}
@@ -63,16 +63,8 @@ const EditPostDialog = ({ open, post, onClose, onSave }) => {
                   borderRadius: "8px",
                 }}
               >
-                <img
-                  src={attachment.medium_url}
-                  alt={attachment.filename}
-                  style={{ width: '80%', marginRight: "16px" }}
-                />
-                {/* <Typography sx={{ flexGrow: 1 }}>{attachment.filename}</Typography> */}
-                <IconButton
-                  color="error"
-                  onClick={() => handleDeleteAttachment(post.id, attachment.id)}
-                >
+                <img src={attachment.medium_url} alt={attachment.filename} style={{ width: "80%", marginRight: "16px" }} />
+                <IconButton color="error" onClick={() => handleDeleteAttachment(post.id, attachment.id)}>
                   <DeleteIcon />
                 </IconButton>
               </Box>

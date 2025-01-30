@@ -4,7 +4,7 @@ import TimelineItemMUI from '@mui/lab/TimelineItem';
 import TimelineSeparator from '@mui/lab/TimelineSeparator';
 import TimelineDot from '@mui/lab/TimelineDot';
 import TimelineContent from '@mui/lab/TimelineContent';
-import { Paper, Typography, useTheme, useMediaQuery, Container} from '@mui/material';
+import { Paper, Typography, useTheme, useMediaQuery} from '@mui/material';
 import PlaceIcon from '@mui/icons-material/Place';
 import ImageGallery from '../image-gallery/ImageGallery';
 import './TimelineItem.css';
@@ -87,9 +87,9 @@ const TimelineItem = ({ time, place, header, paragraph, attachments }) => {
           <ImageGallery attachments={attachments} />
           
           {/* Paragraph */}
-          <Container className="paragraph">
+          <div className="paragraph">
             {paragraph}
-          </Container>
+          </div>
         </Paper>
       </TimelineContent>
     </TimelineItemMUI>
