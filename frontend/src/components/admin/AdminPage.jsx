@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
 import {
     Container,
     Typography,
@@ -12,34 +11,30 @@ import {
     Paper,
     Button,
     CircularProgress,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle
-} from '@mui/material';
-
-import { getPosts, deletePost } from '../../apis/PostApi';
+} from "@mui/material";
+import { getPosts, deletePost, updatePost } from "../../apis/PostApi";
+import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
+import EditPostDialog from "./EditPostDialog";
 
 const AdminPage = () => {
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [deletePostId, setDeletePostId] = useState(null); // Stores post ID to delete
+    const [deletePostId, setDeletePostId] = useState(null);
+    const [editPost, setEditPost] = useState(null); // Stores post object for editing
 
     // Fetch posts from API
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                getPosts((response) => setPosts(response.data))
+                getPosts((response) => setPosts(response.data));
             } catch (error) {
-                setError('Failed to load posts');
-                console.error('Error fetching posts:', error);
+                setError("Failed to load posts");
+                console.error("Error fetching posts:", error);
             } finally {
                 setLoading(false);
             }
         };
-
         fetchPosts();
     }, []);
 
@@ -47,13 +42,25 @@ const AdminPage = () => {
     const handleConfirmDelete = async () => {
         if (!deletePostId) return;
         try {
-            deletePost(deletePostId);
-            getPosts((response) => setPosts(response.data))
+            await deletePost(deletePostId);
+            getPosts((response) => setPosts(response.data));
         } catch (error) {
-            console.error('Error deleting post:', error);
-            alert('Failed to delete post.');
+            console.error("Error deleting post:", error);
+            alert("Failed to delete post.");
         } finally {
             setDeletePostId(null);
+        }
+    };
+
+    // Handle saving edited post
+    const handleSaveEdit = async (id, newContent) => {
+        try {
+            await updatePost(id, { content: newContent });
+            getPosts((response) => setPosts(response.data));
+            setEditPost(null);
+        } catch (error) {
+            console.error("Error updating post:", error);
+            alert("Failed to update post.");
         }
     };
 
@@ -72,10 +79,18 @@ const AdminPage = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell><strong>ID</strong></TableCell>
-                                <TableCell><strong>Location</strong></TableCell>
-                                <TableCell><strong>Content</strong></TableCell>
-                                <TableCell><strong>Actions</strong></TableCell>
+                                <TableCell>
+                                    <strong>ID</strong>
+                                </TableCell>
+                                <TableCell>
+                                    <strong>Location</strong>
+                                </TableCell>
+                                <TableCell>
+                                    <strong>Content</strong>
+                                </TableCell>
+                                <TableCell>
+                                    <strong>Actions</strong>
+                                </TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -85,6 +100,14 @@ const AdminPage = () => {
                                     <TableCell>{post.location}</TableCell>
                                     <TableCell>{post.content}</TableCell>
                                     <TableCell>
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={() => setEditPost(post)}
+                                            sx={{ mr: 1 }}
+                                        >
+                                            Edit
+                                        </Button>
                                         <Button
                                             variant="contained"
                                             color="error"
@@ -101,25 +124,21 @@ const AdminPage = () => {
             )}
 
             {/* Delete Confirmation Dialog */}
-            <Dialog
+            <DeleteConfirmationDialog
                 open={Boolean(deletePostId)}
                 onClose={() => setDeletePostId(null)}
-            >
-                <DialogTitle>Confirm Deletion</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Are you sure you want to delete this post? This action cannot be undone.
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setDeletePostId(null)} color="primary">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleConfirmDelete} color="error" variant="contained">
-                        Delete
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                onConfirm={handleConfirmDelete}
+            />
+
+            {/* Edit Post Dialog */}
+            {editPost && (
+                <EditPostDialog
+                    open={Boolean(editPost)}
+                    post={editPost}
+                    onClose={() => setEditPost(null)}
+                    onSave={handleSaveEdit}
+                />
+            )}
         </Container>
     );
 };

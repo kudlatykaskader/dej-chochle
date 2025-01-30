@@ -16,43 +16,15 @@ services:
       - ./frontend:/app
 
   backend:
-    # build: backend/
-    image: ruby:3.2.2
+    build: backend/
+    image: ghcr.io/warehog/podej-dalej/pd-backend:develop
     ports:
       - 3001:3000
-    environment:
-      RAILS_ENV: development
-      DB_ADAPTER: postgresql
-      DB_HOST: db
-      DB_NAME: db_name
-      DB_USER: db_user
-      DB_PASS: db_pass
-      STORAGE_SERVICE: local
-      MINIO_BUCKET: default
-      MINIO_ENDPOINT: http://minio:9000
-      MINIO_ACCESS_KEY_ID: administrator
-      MINIO_SECRET_ACCESS_KEY: administrator
-    volumes:
-      - ./backend:/app
     entrypoint: >
       /bin/sh -c "
-        cd /app;
-        bundle install;
-        bundle exec rails s -b 0.0.0.0;
-      "
-    depends_on:
-      - migrate
-
-  migrate:
-    image: ruby:3.2.2
-    entrypoint: >
-      /bin/sh -c "
-        cd /app;
-        bundle install;
         rails db:migrate;
+        bundle exec rails server -b 0.0.0.0;
       "
-    volumes:
-      - ./backend:/app
     environment:
       RAILS_ENV: development
       DB_ADAPTER: postgresql
@@ -65,8 +37,7 @@ services:
       MINIO_ENDPOINT: http://minio:9000
       MINIO_ACCESS_KEY_ID: administrator
       MINIO_SECRET_ACCESS_KEY: administrator
-    depends_on:
-      - db
+
 
   db:
     image: postgres:15

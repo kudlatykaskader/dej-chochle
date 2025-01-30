@@ -10,6 +10,9 @@ RUN bundle install
 # Copy the rest of the Rails app
 COPY . /app
 
+# Install libvips
+RUN apt-get update -qq && apt-get install -y libvips libvips-dev
+
 # Expose Rails default port (optional, for local Docker usage)
 EXPOSE 3000
 

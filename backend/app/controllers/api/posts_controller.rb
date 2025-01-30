@@ -52,6 +52,7 @@ module Api
         attachments: post.attachments.map do |attachment|
           blob = attachment.blob
           {
+            id: attachment.id,
             big_url: generate_presigned_url(attachment.variant(resize_to_limit: [3840, 2160])),
             medium_url: generate_presigned_url(attachment.variant(resize_to_limit: [1920, 1080])),
             small_url: generate_presigned_url(attachment.variant(resize_to_limit: [150, 150])),
@@ -71,6 +72,18 @@ module Api
         expires_in: 1.hour,
         disposition: "inline"
       )
+    end
+  end
+
+  class AttachmentsController < ApplicationController
+    def destroy
+      @post = Post.find(params[:post_id])
+      @attachment = @post.attachments.find(params[:id])
+      if @attachment.purge
+        render json: { message: 'Attachment deleted successfully' }, status: :ok
+      else
+        render json: { error: 'Failed to delete attachment' }, status: :unprocessable_entity
+      end
     end
   end
 end
