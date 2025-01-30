@@ -33,15 +33,18 @@ export const deletePost = (id, callback) => {
     axios.delete(`/posts/${id}`).then(callback);
 }
 
-export const updatePost = async (id, post, attachments, callback) => {
+export const updatePost = async (id, post, callback) => {
     const formData = new FormData();
-    formData.append('post[location]', post.location);
-    formData.append('post[content]', post.content);
-    formData.append('post[lat]', post.lat);
-    formData.append('post[lng]', post.lng);
-    formData.append('post[contact]', post.contact);
-    attachments.forEach((file) => formData.append('post[attachments][]', file));
-
+    if (post.location)
+        formData.append('post[location]', post.location);
+    if (post.content)
+        formData.append('post[content]', post.content);
+    if (post.lat)
+        formData.append('post[lat]', post.lat);
+    if (post.lng)
+        formData.append('post[lng]', post.lng);
+    if (post.contact)
+        formData.append('post[contact]', post.contact);
     try {
         const response = await axios.put(`/posts/${id}`, formData, {
             headers: {

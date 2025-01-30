@@ -1,6 +1,6 @@
 module Api
   class PostsController < ApplicationController
-    before_action :set_post, only: [:show, :destroy]
+    before_action :set_post, only: [:show, :update, :destroy]
 
     def index
       @posts = Post.with_attached_attachments.order(created_at: :desc)
@@ -26,6 +26,14 @@ module Api
         render json: { message: 'Post deleted successfully' }, status: :ok
       else
         render json: { error: 'Failed to delete post' }, status: :unprocessable_entity
+      end
+    end
+
+    def update
+      if @post.update(post_params)
+        render json: post_data(@post), status: :ok
+      else
+        render json: { errors: @post.errors.full_messages }, status: :unprocessable_entity
       end
     end
 
