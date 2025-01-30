@@ -5,15 +5,13 @@ import NotesIcon from '@mui/icons-material/Notes';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import InfoIcon from '@mui/icons-material/Info';
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
+import  InfoCard from './InfoCard';
 
 import { 
     OuterSectionContainer,
     OuterSectionIcon,
     InfoStepsCardsContainer,
-    InfoStepsCard,
-    InfoStepsCardIconBox,
     HorizontalButtonGroup,
-    InfoStepsCardContent
 } from './styled-components';
 
 const steps = [
@@ -64,20 +62,8 @@ const Introduction = ({ onScrollToMultiPost, onScrollToCreatePost }) => {
                     {steps.map((step, index) => {
                         const Icon = step.icon;
                         return (
-                            <InfoStepsCard key={index}>
-                                <InfoStepsCardIconBox>
-                                    <Icon/>
-                                </InfoStepsCardIconBox>
-                                <InfoStepsCardContent>
-                                    <Typography variant="h6" gutterBottom>
-                                        {step.label}
-                                    </Typography>
-                                    <Typography variant="body2">
-                                        {step.description}
-                                    </Typography>
-                                </InfoStepsCardContent>
-                            </InfoStepsCard>
-                        );
+                            <InfoCard key={index} title={step.label} description={step.description} icon={Icon}/>
+                        )
                     })}
 
                 {/* Buttons */}
