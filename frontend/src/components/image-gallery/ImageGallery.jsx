@@ -71,7 +71,7 @@ const ImageGallery = ({ attachments }) => {
         onClick={handleFullscreenToggle}
       >
         <img
-          src={attachments[selectedIndex].url}
+          src={attachments[selectedIndex].medium_url}
           alt={attachments[selectedIndex].filename}
           style={{
             width: '100%',
@@ -134,7 +134,7 @@ const ImageGallery = ({ attachments }) => {
               }}
             >
               <img
-                src={attachment.url}
+                src={attachment.small_url}
                 alt={attachment.filename}
                 style={{
                   width: '100%',
@@ -167,7 +167,7 @@ const ImageGallery = ({ attachments }) => {
           }}
         >
           <img
-            src={attachments[selectedIndex].url}
+            src={attachments[selectedIndex].big_url}
             alt={attachments[selectedIndex].filename}
             style={{
               maxWidth: '100%',

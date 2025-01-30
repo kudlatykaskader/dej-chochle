@@ -52,7 +52,9 @@ module Api
         attachments: post.attachments.map do |attachment|
           blob = attachment.blob
           {
-            url: generate_presigned_url(attachment),
+            big_url: generate_presigned_url(attachment.variant(resize_to_limit: [3840, 2160])),
+            medium_url: generate_presigned_url(attachment.variant(resize_to_limit: [1920, 1080])),
+            small_url: generate_presigned_url(attachment.variant(resize_to_limit: [150, 150])),
             type: blob.content_type,
             filename: blob.filename.to_s
           }
