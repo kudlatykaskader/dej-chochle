@@ -210,6 +210,8 @@ spec:
           ports:
             - containerPort: 9000
               hostPort: 9000
+            - containerPort: 9001
+              hostPort: 9001
           volumeMounts:
             - name: pd-dev-minio-data
               mountPath: /data
@@ -326,10 +328,12 @@ data:
       reverse_proxy /rails/* backend:3000 {
       
       }
-      reverse_proxy frontend:80 {
-      
+
+      handle_path /minio* {
+          reverse_proxy minio:9000 
       }
-      reverse_proxy /s3 minio:9000 {
+
+      reverse_proxy frontend:80 {
       
       }
     }
