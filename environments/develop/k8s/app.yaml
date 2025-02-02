@@ -202,6 +202,8 @@ spec:
           args:
             - server
             - /storage
+            - --console-address
+            - ":9001"
           env:
             - name: MINIO_ROOT_USER
               value: administrator
