@@ -236,10 +236,6 @@ spec:
       protocol: TCP
       port: 9000
       targetPort: 9000
-    - name: web
-      protocol: TCP
-      port: 9001
-      targetPort: 9001
 ---
 apiVersion: batch/v1
 kind: Job
