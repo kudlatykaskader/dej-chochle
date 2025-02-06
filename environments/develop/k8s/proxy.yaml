@@ -1,0 +1,87 @@
+---
+###
+# CADDY CONFIGMAP
+###
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: caddy-config
+  namespace: pd-dev-ns
+data:
+  Caddyfile: |-
+    {
+      admin off
+      auto_https disable_redirects
+    }
+
+    http:// {
+      reverse_proxy /api/* backend:3000 {
+      
+      }
+      
+      reverse_proxy /rails/* backend:3000 {
+      
+      }
+
+      handle_path /minio* {
+          reverse_proxy minio:9000 
+      }
+
+      reverse_proxy frontend:80 {
+      
+      }
+    }
+
+---
+###
+# CADDY DEPLOYMENT
+###
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: caddy-proxy
+  namespace: pd-dev-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: caddy-proxy
+  template:
+    metadata:
+      labels:
+        app: caddy-proxy
+    spec:
+      containers:
+        - name: caddy
+          image: caddy:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: caddy-config
+              mountPath: /etc/caddy
+      volumes:
+        - name: caddy-config
+          configMap:
+            name: caddy-config
+
+---
+###
+# CADDY SERVICE - PUBLIC ENTRY POINT
+###
+apiVersion: v1
+kind: Service
+metadata:
+  name: caddy-proxy
+  namespace: pd-dev-ns
+spec:
+  selector:
+    app: caddy-proxy
+  # Expose port 80 externally via NodePort (for dev),
+  # or you might use LoadBalancer in a real environment.
+  type: NodePort
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30080

@@ -102,7 +102,7 @@ jobs:
         env:
           KUBE_CONFIG: ${{ secrets.PL_LP_K3S_CONFIG }}
         with:
-          args: apply -f environments/develop/k8s/app.yaml
+          args: apply -f environments/develop/k8s/app.yaml -f environments/develop/k8s/database.yaml -f environments/develop/k8s/minio.yaml -f environments/develop/k8s/proxy.yaml
 
   # deploy-prod:
   #   if: ${{ github.ref == 'refs/heads/prod' || github.event_name == 'workflow_dispatch' }}

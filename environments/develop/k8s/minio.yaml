@@ -1,0 +1,108 @@
+### Headless Service for StatefulSet
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: pd-dev-ns
+spec:
+  clusterIP: None  # Makes this service headless for stable DNS entries.
+  selector:
+    app: minio  
+  ports:
+    - name: api
+      protocol: TCP
+      port: 9000
+      targetPort: 9000
+    - name: web
+      protocol: TCP
+      port: 9001
+      targetPort: 9001
+---
+### MinIO StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio
+  namespace: pd-dev-ns
+spec:
+  serviceName: minio   # Must match the headless service name.
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+        - name: minio
+          image: minio/minio:latest
+          args:
+            - server
+            - /storage
+            - --console-address
+            - ":9001"
+          env:
+            - name: MINIO_ROOT_USER
+              value: administrator
+            - name: MINIO_ROOT_PASSWORD
+              value: administrator
+            - name: MINIO_BROWSER_REDIRECT_URL
+              value: http://podej-dalej-dev.postio.pl/minio
+          ports:
+            - containerPort: 9000
+              hostPort: 9000
+            - containerPort: 9001
+              hostPort: 9001
+          volumeMounts:
+            - name: pd-dev-minio-data
+              mountPath: /data
+  volumeClaimTemplates:
+    - metadata:
+        name: pd-dev-minio-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
+---
+### Job to Create the Bucket Automatically Using mc
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-bucket
+  namespace: pd-dev-ns
+spec:
+  template:
+    spec:
+      containers:
+        - name: create-bucket
+          image: minio/mc
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Configuring alias for MinIO";
+              mc config host add myminio http://minio:9000 administrator administrator;
+              
+              echo "Waiting for MinIO to be ready...";
+              max_attempts=10;
+              attempt=1;
+              sleep_interval=3;
+              until mc admin info myminio >/dev/null 2>&1 || [ $attempt -gt $max_attempts ]; do
+                echo "Attempt $attempt/$max_attempts: MinIO not ready. Waiting ${sleep_interval} seconds...";
+                attempt=$((attempt + 1));
+                sleep $sleep_interval;
+              done;
+              if [ $attempt -gt $max_attempts ]; then
+                echo "Error: MinIO is not responding after $((max_attempts * sleep_interval)) seconds.";
+                exit 1;
+              fi;
+              
+              echo "Creating bucket 'default'";
+              mc mb myminio/default;
+              
+              echo "Setting anonymous download policy on bucket 'default'";
+              mc anonymous set download myminio/default;
+      restartPolicy: Never
+  backoffLimit: 4
