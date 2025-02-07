@@ -37,19 +37,16 @@ spec:
     spec:
       containers:
         - name: minio
-          image: minio/minio:latest
-          args:
-            - server
-            - /storage
-            - --console-address
-            - ":9001"
+          image: docker.io/bitnami/minio:2025
           env:
             - name: MINIO_ROOT_USER
               value: administrator
             - name: MINIO_ROOT_PASSWORD
               value: administrator
+            - name: MINIO_DEFAULT_BUCKETS
+              value: default
             - name: MINIO_BROWSER_REDIRECT_URL
-              value: http://podej-dalej-dev.postio.pl/minio
+              value: http://podej-dalej-dev.postio.pl/minio/
           ports:
             - containerPort: 9000
               hostPort: 9000
@@ -68,41 +65,37 @@ spec:
             storage: 1Gi
 ---
 ### Job to Create the Bucket Automatically Using mc
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: create-bucket
-  namespace: pd-dev-ns
-spec:
-  template:
-    spec:
-      containers:
-        - name: create-bucket
-          image: minio/mc
-          command: ["/bin/sh", "-c"]
-          args:
-            - |
-              echo "Configuring alias for MinIO";
-              mc config host add myminio http://minio:9000 administrator administrator;
-              
-              echo "Waiting for MinIO to be ready...";
-              max_attempts=10;
-              attempt=1;
-              sleep_interval=3;
-              until mc admin info myminio >/dev/null 2>&1 || [ $attempt -gt $max_attempts ]; do
-                echo "Attempt $attempt/$max_attempts: MinIO not ready. Waiting ${sleep_interval} seconds...";
-                attempt=$((attempt + 1));
-                sleep $sleep_interval;
-              done;
-              if [ $attempt -gt $max_attempts ]; then
-                echo "Error: MinIO is not responding after $((max_attempts * sleep_interval)) seconds.";
-                exit 1;
-              fi;
-              
-              echo "Creating bucket 'default'";
-              mc mb myminio/default;
-              
-              echo "Setting anonymous download policy on bucket 'default'";
-              mc anonymous set download myminio/default;
-      restartPolicy: Never
-  backoffLimit: 4
+# apiVersion: batch/v1
+# kind: Job
+# metadata:
+#   name: create-bucket
+#   namespace: pd-dev-ns
+# spec:
+#   template:
+#     spec:
+#       containers:
+#         - name: create-bucket
+#           image: minio/mc
+#           command: ["/bin/sh", "-c"]
+#           args:
+#             - |
+#                 echo "Configuring alias for MinIO";
+#                 attempts=0;
+#                 max_attempts=5;
+#                 until mc config host add myminio http://minio:9000 administrator administrator || [ $attempts -eq $max_attempts ]; do
+#                 attempts=$((attempts+1));
+#                 echo "Attempt $attempts/$max_attempts: MinIO is not responding, retrying in 5 seconds...";
+#                 sleep 5;
+#                 done;
+#                 if [ $attempts -eq $max_attempts ]; then
+#                 echo "Error: MinIO is not responding after $max_attempts attempts.";
+#                 exit 1;
+#                 fi;
+                
+#                 echo "Creating bucket 'default'";
+#                 mc mb myminio/default;
+                
+#                 echo "Setting anonymous download policy on bucket 'default'";
+#                 mc anonymous set download myminio/default;
+#       restartPolicy: Never
+#   backoffLimit: 4
