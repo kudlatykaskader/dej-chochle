@@ -45,6 +45,8 @@ spec:
               value: administrator
             - name: MINIO_DEFAULT_BUCKETS
               value: default
+            - name: MINIO_DATA_DIR
+              value: /data
             - name: MINIO_BROWSER_REDIRECT_URL
               value: http://podej-dalej-dev.postio.pl/minio/
           ports:
