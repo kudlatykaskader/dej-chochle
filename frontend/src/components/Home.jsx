@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { Container, Divider } from '@mui/material';
+import Header from './Header';
 import Introduction from './Introduction';
 import Gallery from './Gallery';
 import UploadForm from './upload-form/UploadForm';
@@ -16,6 +17,7 @@ const Home = () => {
 
     return (
         <Container maxWidth="md" sx={{ mt: 4 }}>
+            <Header />
             <Introduction
                 onScrollToMultiPost={() => scrollToComponent(multiPostRef)}
                 onScrollToCreatePost={() => scrollToComponent(createPostRef)}

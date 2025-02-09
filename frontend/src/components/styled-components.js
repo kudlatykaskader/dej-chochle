@@ -1,5 +1,5 @@
 import { styled } from '@mui/material/styles';
-import { Box, Container, Card, CardContent } from '@mui/material';
+import { Box, Container, Card, CardContent, Button } from '@mui/material';
 
 export const OuterSectionContainer = styled(Container)({
     mt: 2,
@@ -13,14 +13,14 @@ export const OuterSectionIcon = styled(Box)(({ theme }) => ({
     justifyContent: 'center',
     paddingBottom: theme.spacing(2),
     '& .MuiSvgIcon-root': {
-        fontSize: 60,
+        fontSize: 40,
     },
 }));
 
 export const InfoStepsCardsContainer = styled(Container)({
     display: 'flex',
     flexDirection: 'column',
-    gap: 2,
+    gap: 1,
     mt: 3
 });
 
@@ -32,7 +32,7 @@ export const InfoStepsCard = styled(Card)(({ theme }) => ({
     boxShadow: 3,
     alignContent: 'center',
     '& .MuiSvgIcon-root': {
-        fontSize: 40,
+        fontSize: 30,
         color: theme.palette.primary.main,
     },
 }));
@@ -52,7 +52,25 @@ export const InfoStepsCardContent = styled(CardContent)(({ theme }) => ({
 
 export const HorizontalButtonGroup = styled(Box)({
     display: 'flex',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     marginTop: 20,
-    gap: 4
+    gap: 40
+});
+
+export const ModalBox = styled(Box)({
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    backgroundColor: "white",
+    borderRadius: 8,
+    boxShadow: 24,
+    padding: 20,
+});
+
+export const StyledButton = styled(Button)({
+    color: "primary",
+    fontSize: '1.2rem',
+    margin: "0 10px",
 });

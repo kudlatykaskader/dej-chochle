@@ -1,7 +1,8 @@
 import React from 'react';
-import { useTheme, useMediaQuery, Typography } from '@mui/material';
+import { useTheme, useMediaQuery, Typography, Container } from '@mui/material';
 import { InfoStepsCard, InfoStepsCardIconBox, InfoStepsCardContent } from './styled-components';
 import PropTypes from 'prop-types';
+import './InfoCard.css'
 
 const InfoCard = ({ title, description, icon }) => {
     const theme = useTheme();
@@ -16,16 +17,23 @@ const InfoCard = ({ title, description, icon }) => {
             )}
             <InfoStepsCardContent>
                 {isMobile && (
-                    <InfoStepsCardIconBox>
-                        <Icon />
-                    </InfoStepsCardIconBox>
+                    <Container sx={{ display: 'flex', justifyContent: 'center' , flexDirection: 'row', alignItems: 'center'}}>
+                        <InfoStepsCardIconBox>
+                            <Icon />
+                        </InfoStepsCardIconBox>
+                        <Typography variant="h6" gutterBottom>
+                            {title}
+                        </Typography>
+                    </Container>
                 )}
-                <Typography variant="h6" gutterBottom>
-                    {title}
-                </Typography>
-                <Typography variant="body2">
+                {!isMobile && (
+                    <Typography variant="h6" gutterBottom>
+                        {title}
+                    </Typography>
+                )}
+                <div className='info-card-description'>
                     {description}
-                </Typography>
+                </div>
             </InfoStepsCardContent>
         </InfoStepsCard>
     );

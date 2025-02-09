@@ -1,0 +1,19 @@
+.info-card-description {
+    /* font-size: 1.2rem; */
+    /* margin-top: 1rem; */
+    /* color: #333; */
+    white-space: pre;
+    white-space: pre-line;
+}
+
+.info-section-paragraph {
+    margin-bottom: 16px;
+    margin-top: 16px;
+    text-align: justify;
+    white-space: pre;
+    white-space: pre-line;
+    border: 1px solid #efefef ;
+    border-radius: 5px;
+    padding: 5px;
+    text-align: justify;
+}
