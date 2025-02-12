@@ -5,7 +5,7 @@ import theme from './theme';
 import Home from './components/Home';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import axios from "axios";
-import Footer from './components/Footer';
+import Footer from './components/navigation/Footer';
 import AdminPage from './components/admin/AdminPage';
 import Header from './components/navigation/Header';
 import { AppContainer } from './components/styled-components';
@@ -21,14 +21,16 @@ function App() {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <Router>
+                <AppContainer>
                 <Header />
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/pomocy" element={<PomocyPage />} />
                     <Route path="/admin" element={<AdminPage />} />
                 </Routes>
+                </AppContainer>
+                <Footer />
             </Router>
-            <Footer />
         </ThemeProvider>
     );
 }

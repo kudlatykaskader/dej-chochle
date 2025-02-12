@@ -1,5 +1,13 @@
 import { styled } from '@mui/material/styles';
-import { Box, Container, Card, CardContent, Button } from '@mui/material';
+import { Box, Container, Card, CardContent, Button, AppBar } from '@mui/material';
+
+export const AppContainer = styled(Box)({
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: 'calc(100vh - var(--footer-height))',
+    position: 'relative',
+
+});
 
 export const OuterSectionContainer = styled(Container)({
     mt: 2,
@@ -74,6 +82,7 @@ export const StyledButton = styled(Button)({
     fontSize: '1.2rem',
     margin: "0 10px",
 });
+
 export const StyledAppBar = styled(AppBar)({
     backgroundColor: 'white',
 });
