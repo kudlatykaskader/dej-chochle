@@ -74,3 +74,6 @@ export const StyledButton = styled(Button)({
     fontSize: '1.2rem',
     margin: "0 10px",
 });
+export const StyledAppBar = styled(AppBar)({
+    backgroundColor: 'white',
+});

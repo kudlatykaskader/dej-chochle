@@ -7,7 +7,8 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import axios from "axios";
 import Footer from './components/Footer';
 import AdminPage from './components/admin/AdminPage';
-import PomocyPage from './components/PomocyPage';
+import Header from './components/navigation/Header';
+import { AppContainer } from './components/styled-components';
 
 function App() {
     if (process.env.NODE_ENV === 'development') {
@@ -20,6 +21,7 @@ function App() {
         <ThemeProvider theme={theme}>
             <CssBaseline />
             <Router>
+                <Header />
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/pomocy" element={<PomocyPage />} />
