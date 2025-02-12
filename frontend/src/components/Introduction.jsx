@@ -25,8 +25,6 @@ const steps = [
 const Introduction = ({ onScrollToMultiPost, onScrollToCreatePost }) => {
     return (
         <OuterSectionContainer>
-            <Divider sx={{ my: 2 }} />
-            
             <OuterSectionIcon>
                 <InfoIcon />
             </OuterSectionIcon>

@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import axios from "axios";
 import Footer from './components/navigation/Footer';
 import AdminPage from './components/admin/AdminPage';
+import PomocyPage from './components/navigation-pages/PomocyPage';
 import Header from './components/navigation/Header';
 import { AppContainer } from './components/styled-components';
 
