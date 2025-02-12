@@ -34,7 +34,7 @@ const ModernAccordion = styled(Accordion)({
 
 // FAQ Data
 const faqItems = [
-    { question: "Podróżnik jest zepsuty, co mam zrobić?", answer: "Skontaktuj się z nami (zakładka Kontakt) i opisz problem. Jeżeli nie znajdujesz się na końcu świata, to wyślemy Ci nowego." },
+    { question: "Podróżnik jest zepsuty, co mam zrobić?", answer: "Skontaktuj się z nami (zakładka Kontakt) i opisz problem. Jeżeli nie znajdujesz się na końcu świata, to może znajdziemy jakiś zamiennik. Lub wykonasz go samodzielnie?" },
     { question: "Czy mogę zabrać Podróżnika na wakacje?", answer: "Oczywiście! O ile nie będziesz go przetrzymywać zbyt długo. Podróżnik lubi być w ruchu." },
     { question: "Komu mogę przekazać Podróżnika?", answer: "Podróżnika możesz przekazać każdemu, kto zgodzi się na zasady gry. Może to być Twoja rodzina, przyjaciele, a nawet nieznajomi, o ile rozumieją zasady. Nie chcemy aby Podróżnik zaginął lub został stałą ozdobą na półce." },
     { question: "Co powinny przedstawiać zdjęcia?", answer: "Zdjęcie powinno przedstawiać Podróżnika w ciekawym miejscu, który odwiedził razem z Tobą. Może to być zabytek, piękny widok, a nawet Twoje ulubione miejsce w mieście. Pamiętaj, aby nie pokazywać adresu zamieszkania." },
